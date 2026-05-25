@@ -26,6 +26,8 @@
 #define RAMDISK_BASE			0x80B00000
 #define RAMDISK_SIZE			0x6400000
 
+#define CONFIG_ENV_OVERWRITE
+
 #define CONFIG_BOOTARGS			"console=ttyPS3,115200 " \
 					"maxcpus=4 nr_cpus=4 earlycon " \
 					"hugepages=16 root=/dev/ram rw " \
