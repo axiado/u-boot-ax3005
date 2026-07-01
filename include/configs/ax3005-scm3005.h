@@ -28,11 +28,10 @@
 
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_BOOTARGS			"console=ttyPS3,115200 " \
-					"maxcpus=4 nr_cpus=4 earlycon " \
-					"hugepages=16 root=/dev/ram rw " \
-					"phram.phram=ramrofs," \
-					__stringify(RAMDISK_BASE) "," __stringify(RAMDISK_SIZE)
+#define CFG_EXTRA_ENV_SETTINGS \
+	"bootargs=console=ttyPS3,115200 maxcpus=4 nr_cpus=4 earlycon " \
+	"hugepages=16 root=/dev/ram rw phram.phram=ramrofs," \
+	__stringify(RAMDISK_BASE) "," __stringify(RAMDISK_SIZE) "\0"
 
 #define CFG_SYS_BAUDRATE_TABLE	\
 	{ 4800, 9600, 19200, 38400, 57600, 115200 }
