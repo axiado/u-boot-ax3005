@@ -1075,6 +1075,11 @@ config ASPEED_MDIO
 	  This driver supports the MDIO bus of Aspeed AST2600 SOC.  The driver
 	  currently supports Clause 22.
 
+config AXIADO_ETH
+	bool "Axiado Net interface support"
+	help
+	  This driver supports the MAC of Axiado AX3005 SOC.
+
 config MDIO_MSCC_MIIM
 	bool "Microsemi MIIM interface support"
 	depends on DM_MDIO

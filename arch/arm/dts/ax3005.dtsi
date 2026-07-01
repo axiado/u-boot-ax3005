@@ -127,5 +127,11 @@
 			phy-names = "phy_arasan";
 			status = "disabled";
 		};
+
+		mac0: ethernet@43100400 {
+			compatible = "axiado,ax3005-mac";
+			reg = <0x0 0x43100400 0x0 0x400>;
+			status = "disabled";
+		};
 	};
 };
