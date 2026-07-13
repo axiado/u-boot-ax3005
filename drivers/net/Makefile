@@ -9,6 +9,7 @@ obj-y += airoha/
 obj-$(CONFIG_AIROHA_ETH) += airoha_eth.o
 obj-$(CONFIG_ALTERA_TSE) += altera_tse.o
 obj-$(CONFIG_ASPEED_MDIO) += aspeed_mdio.o
+obj-$(CONFIG_AXIADO_ETH) += axiado-eth.o
 obj-$(CONFIG_BCM6348_ETH) += bcm6348-eth.o
 obj-$(CONFIG_BCM6368_ETH) += bcm6368-eth.o
 obj-$(CONFIG_BCMGENET) += bcmgenet.o
