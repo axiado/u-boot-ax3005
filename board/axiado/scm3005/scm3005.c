@@ -18,7 +18,7 @@
 #include <linux/types.h>
 #include <asm/system.h>
 
-/* Defined in ax_devcfg.c (built with -fshort-enums to match the R52 blob ABI). */
+/* Defined in ax_devcfg.c */
 u32 ax_counter_freq_from_devcfg(void);
 
 DECLARE_GLOBAL_DATA_PTR;
