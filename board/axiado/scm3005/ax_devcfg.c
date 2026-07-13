@@ -101,8 +101,8 @@ typedef struct ax_board_config_header_s {
  */
 #define AX_DEV_CFG_HANDOFF_ADDR			0x800FF000UL /* must match ax_board_init.c */
 #define AX_CPU_PLL_POSTDIV_DEVCFG_ADDR	0x40000008U  /* AX_BOARD_REG_SETTING_BASE + 0x08 */
-#define AX_A53_POSTDIV0_2_LSB			6U
-#define AX_A53_POSTDIV1_2_LSB			18U
+#define AX3005_POSTDIV0_2_LSB			6U
+#define AX3005_POSTDIV1_2_LSB			18U
 #define AX_POSTDIV_MASK					0x7U
 #define AX_CPU_PLL_VCO_HZ				4000000000ULL
 #define AX_DEFAULT_COUNTER_FREQ			1000000000U  /* default CPU_CLOCK = 4000/4 */
@@ -135,8 +135,8 @@ u32 ax_counter_freq_from_devcfg(void)
 	for (i = 0; i < count; i++) {
 		if (hdr->reg_setting[i].addr == AX_CPU_PLL_POSTDIV_DEVCFG_ADDR) {
 			u32 val = hdr->reg_setting[i].value;
-			u32 d0 = (val >> AX_A53_POSTDIV0_2_LSB) & AX_POSTDIV_MASK;
-			u32 d1 = (val >> AX_A53_POSTDIV1_2_LSB) & AX_POSTDIV_MASK;
+			u32 d0 = (val >> AX3005_POSTDIV0_2_LSB) & AX_POSTDIV_MASK;
+			u32 d1 = (val >> AX3005_POSTDIV1_2_LSB) & AX_POSTDIV_MASK;
 
 			return (u32)(AX_CPU_PLL_VCO_HZ / ((u64)(d0 + 1) * (d1 + 1)));
 		}
