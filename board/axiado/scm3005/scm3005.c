@@ -161,3 +161,101 @@ int board_init(void)
 void reset_cpu(void)
 {
 }
+
+#define AX3005_SCRATCHPAD_ADDR 0x33120804 /* AX3005_CSR_BASE_ADRS_IOCTL_1 */
+
+#define WATCHDOG_ENABLE 1
+#define WATCHDOG_DISABLE 0
+
+/* action settings */
+#define ACTION_NC 0 /* no action*/
+#define ACTION_RESET_CPU 1 /* reset CPU */
+#define ACTION_RESET_SOC 2 /* reset SOC */
+#define ACTION_BOOT_ALTE_LOT 3 /*  reset and boot from alternative lot */
+#define ACTION_RESET_GOLDEN 4 /* reset with golden image */
+
+/* boot stages */
+#define BS_PRE_LOAD 0 /* pre-load */
+#define BS_UBOOT 1 /* u-boot */
+#define BS_KERNEL 2 /* kernel */
+#define BS_INIT_RAM_FS 3 /* initramfs */
+#define BS_ROOT_FS 4 /* rootfs */
+
+#define TIMEOUT_NC 0
+#define TIMEOUT_60_SECONDS 60
+
+typedef union {
+	u32 raw; // access all 32 bits at once
+	struct {
+		u32 counter : 16;
+		u32 timeout : 8;
+		u32 boot_stage : 3;
+		u32 action : 4;
+		u32 enable : 1;
+	} bits;
+} scratch_pat_t;
+
+/**
+ * @brief set PAD register value at u-boot prompt
+ *
+ * @param void
+ *
+ * @return None
+ */
+void set_pad_in_uboot_state(void)
+{
+	scratch_pat_t pad_val;
+	pad_val.raw = readl(AX3005_SCRATCHPAD_ADDR);
+	pad_val.bits.enable = WATCHDOG_DISABLE;
+	pad_val.bits.action = ACTION_NC;
+	pad_val.bits.boot_stage = BS_UBOOT;
+	pad_val.bits.timeout = TIMEOUT_NC;
+	pad_val.bits.counter += 1;
+	printf("At u-boot: write the value : 0x%x to PAD Register: 0x%x\n",
+	       pad_val.raw, AX3005_SCRATCHPAD_ADDR);
+	writel(pad_val.raw, AX3005_SCRATCHPAD_ADDR);
+}
+
+/*
+ * board_late_init - runs at the end of U-Boot init, just before the
+ * autoboot/console prompt. Stamp the scratchpad to indicate U-Boot has
+ * booted (boot_stage = BS_UBOOT) and bump the liveness counter.
+ * Requires CONFIG_BOARD_LATE_INIT=y in the board defconfig.
+ */
+int board_late_init(void)
+{
+	set_pad_in_uboot_state();
+	return 0;
+}
+
+/**
+ * @brief set PAD register value before jumping to kernel
+ *
+ * @param void
+ *
+ * @return none
+ */
+void set_pad_before_kernel_state(void)
+{
+	scratch_pat_t pad_val;
+	pad_val.raw = readl(AX3005_SCRATCHPAD_ADDR);
+	pad_val.bits.enable = WATCHDOG_ENABLE;
+	pad_val.bits.action = ACTION_NC;
+	pad_val.bits.boot_stage = BS_KERNEL;
+	pad_val.bits.timeout = TIMEOUT_60_SECONDS;
+	pad_val.bits.counter += 1;
+	printf("Before jumping to kernel: write the value : 0x%x to PAD Register: 0x%x\n",
+	       pad_val.raw, AX3005_SCRATCHPAD_ADDR);
+	writel(pad_val.raw, AX3005_SCRATCHPAD_ADDR);
+}
+
+/*
+ * board_preboot_os - board hook called from boot_selected_os(), the last
+ * board-level callback before U-Boot jumps into the OS. Covers all boot
+ * paths (bootm/booti/bootz). Arm the watchdog and mark boot_stage = BS_KERNEL
+ * so the monitor takes over if the kernel fails to hand off in time.
+ */
+void board_preboot_os(void)
+{
+	set_pad_before_kernel_state();
+}
