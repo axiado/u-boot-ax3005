@@ -181,7 +181,6 @@ void reset_cpu(void)
 #define BS_INIT_RAM_FS 3 /* initramfs */
 #define BS_ROOT_FS 4 /* rootfs */
 
-#define TIMEOUT_NC 0
 #define TIMEOUT_60_SECONDS 60
 
 typedef union {
@@ -208,7 +207,6 @@ void set_pad_in_uboot_state(void)
 	pad_val.raw = readl(AX3005_SCRATCHPAD_ADDR);
 	pad_val.bits.enable = WATCHDOG_DISABLE;
 	pad_val.bits.boot_stage = BS_UBOOT;
-	pad_val.bits.timeout = TIMEOUT_NC;
 	pad_val.bits.counter += 1;
 	writel(pad_val.raw, AX3005_SCRATCHPAD_ADDR);
 }
