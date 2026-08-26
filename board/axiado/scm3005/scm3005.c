@@ -13,6 +13,7 @@
 #include <asm/system.h>
 #include <fdt_support.h>
 #include <env.h>
+#include <env_internal.h>
 #include <command.h>
 #include <net.h>
 #include <linux/types.h>
@@ -220,6 +221,14 @@ void set_pad_in_uboot_state(void)
 int board_late_init(void)
 {
 	set_pad_in_uboot_state();
+	/* defaults in use => the eMMC copy was unusable (bad CRC or read error) */
+	if (gd->flags & GD_FLG_ENV_DEFAULT) {
+		int ret = env_save();
+
+		if (ret)
+			printf("WARNING: Failed to write default environment (%d)\n",
+			       ret);
+	}
 	return 0;
 }
 
