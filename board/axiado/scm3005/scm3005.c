@@ -131,19 +131,27 @@ static u32 raw_read_cntfrq_el0(void)
 }
 
 /*
- * timer_init - program CNTFRQ_EL0 from the live counter clock and enable
- * the AX3005 platform system timer.
+ * board_cntfrq_init - program CNTFRQ_EL0 from the dev-cfg-derived counter
+ * clock on every CPU.
+ *
+ * Called from the SoC's boot0.h hook while each CPU is still at EL3, before
+ * secondary CPUs switch to EL2 and enter the spin-table wait. timer_init()
+ * alone is not enough here: it only runs on the boot CPU, so CPU1-3 would
+ * keep CNTFRQ_EL0 == 0 and Linux's per-CPU SYS_CNTFRQ_EL0 sanity check would
+ * trip (TAINT_CPU_OUT_OF_SPEC).
+ */
+void board_cntfrq_init(void)
+{
+	raw_write_cntfrq_el0(ax_counter_freq_from_devcfg());
+}
+
+/*
+ * timer_init - enable the AX3005 platform system timer.
  * SYS_TIMER_CTRL (0x48016000) is the AX3005 system timer control register —
  * writing SYS_TIMER_ENABLE starts the counter that feeds the ARM generic timer.
  */
 int timer_init(void)
 {
-	u32 freq = ax_counter_freq_from_devcfg();
-
-	if (current_el() == 3) {
-		raw_write_cntfrq_el0(freq);
-	}
-
 	writel(SYS_TIMER_ENABLE, (uintptr_t)SYS_TIMER_CTRL);
 	return 0;
 }

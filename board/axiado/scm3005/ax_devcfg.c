@@ -8,6 +8,7 @@
 
 #include <linux/types.h>
 #include <linux/stddef.h>
+#include <asm/unaligned.h>
 #include <u-boot/crc.h>
 
 /**
@@ -34,8 +35,9 @@ typedef struct ax_image_version_s {
  */
 typedef enum {
     AX_TARGET_PLATFORM_EVB = 0,   /* EVB (standalone) */
-    AX_TARGET_PLATFORM_HMC,       /* HMC */
-    AX_TARGET_PLATFORM_BMC,       /* BMC */
+    AX_TARGET_PLATFORM_1,
+    AX_TARGET_PLATFORM_2,
+    AX_TARGET_PLATFORM_3,
 } ax_target_platform_t;
 
 /**
@@ -88,6 +90,7 @@ typedef struct ax_board_config_header_s {
     ax_pwr_func_cfg_t pwr_func;                                /* bit i set -> enable pwr_ctrl entry i */
     /* --- DDR INIT SPEED (optional) --- */
     uint32_t          ddr_speed;                               /* LPDDR5 init speed (MT/s); 0 = firmware default */
+    uint32_t          uart_base_addr;                          /* UART configuration */
 } __attribute__((packed, aligned(4))) ax_board_config_header_t;
 
 /* Magic number stamped in every valid ax_board_config_header_t ("BCFG"). */
@@ -128,13 +131,20 @@ u32 ax_counter_freq_from_devcfg(void)
 	if (crc != hdr->crc32)
 		return AX_DEFAULT_COUNTER_FREQ;
 
-	count = hdr->reg_setting_count;
+	/*
+	 * reg_setting_count and reg_setting[] fall on non-4-byte-aligned
+	 * offsets in this packed, -fshort-enums layout.
+	 * Use byte-wise accessors so this is safe to call from any
+	 * context, not just once caches/MMU are up.
+	 */
+	count = get_unaligned_le32(&hdr->reg_setting_count);
 	if (count > AX_BOARD_REG_SETTING_MAX)
 		count = AX_BOARD_REG_SETTING_MAX;
 
 	for (i = 0; i < count; i++) {
-		if (hdr->reg_setting[i].addr == AX_CPU_PLL_POSTDIV_DEVCFG_ADDR) {
-			u32 val = hdr->reg_setting[i].value;
+		if (get_unaligned_le32(&hdr->reg_setting[i].addr) ==
+		    AX_CPU_PLL_POSTDIV_DEVCFG_ADDR) {
+			u32 val = get_unaligned_le32(&hdr->reg_setting[i].value);
 			u32 d0 = (val >> AX3005_POSTDIV0_2_LSB) & AX_POSTDIV_MASK;
 			u32 d1 = (val >> AX3005_POSTDIV1_2_LSB) & AX_POSTDIV_MASK;
 
