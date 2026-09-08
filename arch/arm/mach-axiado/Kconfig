@@ -11,6 +11,7 @@ config AXIADO_AX3005
 	select ARM64
 	select DM
 	select DM_SERIAL
+	select ENABLE_ARM_SOC_BOOT0_HOOK
 	select GICV3
 	select ZYNQ_SERIAL
 	select MMC_SDHCI_AXIADO
