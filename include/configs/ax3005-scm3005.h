@@ -7,6 +7,7 @@
 #define __AX3005_SCM3005_H
 
 #include <linux/sizes.h>
+#include <linux/stringify.h>
 
 #define GICD_BASE		0x40400000
 #define GICR_BASE		0x40500000
@@ -21,17 +22,28 @@
 #define CFG_SYS_INIT_SP_ADDR	(CFG_SYS_SDRAM_BASE + SZ_1M)
 
 #define CFG_SYS_MAXARGS		64
-#define CFG_SYS_BARGSIZE	CFG_SYS_CBSIZE
 
 #define RAMDISK_BASE			0x80B00000
 #define RAMDISK_SIZE			0x6400000
 
 #define CONFIG_ENV_OVERWRITE
 
-#define CFG_EXTRA_ENV_SETTINGS \
-	"bootargs=console=ttyPS3,115200 maxcpus=4 nr_cpus=4 earlycon " \
+/*
+ * Kernel command line. The console UART is selected at runtime from the
+ * dev-cfg handoff blob, so keep one copy of the arguments here and vary
+ * only the console= token.
+ */
+#define AX_BOOTARGS(con) \
+	"console=" con ",115200 maxcpus=4 nr_cpus=4 earlycon " \
 	"hugepages=16 root=/dev/ram rw phram.phram=ramrofs," \
-	__stringify(RAMDISK_BASE) "," __stringify(RAMDISK_SIZE) "\0"
+	__stringify(RAMDISK_BASE) "," __stringify(RAMDISK_SIZE)
+
+#define AX_BOOTARGS_UART3	AX_BOOTARGS("ttyPS3")
+#define AX_BOOTARGS_UART4	AX_BOOTARGS("ttyPS4")
+
+/* The "\0" separator belongs to this NUL-delimited list, not to the macros. */
+#define CFG_EXTRA_ENV_SETTINGS \
+	"bootargs=" AX_BOOTARGS_UART3 "\0"
 
 #define CFG_SYS_BAUDRATE_TABLE	\
 	{ 4800, 9600, 19200, 38400, 57600, 115200 }
