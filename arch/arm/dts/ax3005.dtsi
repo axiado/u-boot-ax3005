@@ -11,6 +11,7 @@
 / {
 	aliases {
 		serial3 = &uart3;
+		serial4 = &uart4;
 	};
 
 	cpus {
@@ -103,6 +104,17 @@
 			interrupt-parent = <&gic500>;
 			interrupts = <GIC_SPI 170 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x00 0x33020800 0x00 0x100>;
+			clock-names = "uart_clk", "pclk";
+			clocks = <&refclk &refclk>;
+			bootph-pre-reloc;
+			status = "disabled";
+		};
+
+		uart4: serial@331a0400 {
+			compatible = "cdns,uart-r1p12", "xlnx,xuartps";
+			interrupt-parent = <&gic500>;
+			interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0x00 0x331a0400 0x00 0x100>;
 			clock-names = "uart_clk", "pclk";
 			clocks = <&refclk &refclk>;
 			bootph-pre-reloc;

@@ -154,3 +154,22 @@ u32 ax_counter_freq_from_devcfg(void)
 
 	return AX_DEFAULT_COUNTER_FREQ;
 }
+
+u32 get_uart_address_from_devcfg(void)
+{
+	const ax_board_config_header_t *hdr =
+		(const ax_board_config_header_t *)AX_DEV_CFG_HANDOFF_ADDR;
+	u32 len, crc;
+
+	if (hdr->magic != AX_BOARD_CONFIG_MAGIC ||
+	    hdr->total_size != sizeof(*hdr))
+		return 0;
+
+	/* CRC32 covers total_size..end (standard zlib CRC, == ax_bm_crc32). */
+	len = hdr->total_size - offsetof(ax_board_config_header_t, total_size);
+	crc = crc32(0, (const unsigned char *)&hdr->total_size, len);
+	if (crc != hdr->crc32)
+		return 0;
+
+	return get_unaligned_le32(&hdr->uart_base_addr);
+}
