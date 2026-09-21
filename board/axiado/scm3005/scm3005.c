@@ -21,6 +21,7 @@
 
 /* Defined in ax_devcfg.c */
 u32 ax_counter_freq_from_devcfg(void);
+u32 get_uart_address_from_devcfg(void);
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -48,11 +49,27 @@ int board_fit_config_name_match(const char *name)
 }
 
 /*
- * ft_board_setup - restore cpu-release-addr after relocation
+ * uart4_is_console - does the dev-cfg handoff blob select UART4 as console?
+ *
+ * Safe to call before relocation: it reads the control FDT and the handoff
+ * blob only, and writes no global or static storage.
+ */
+static bool uart4_is_console(void)
+{
+	int node = fdt_path_offset(gd->fdt_blob, "serial4"); /* uses the alias */
+
+	return get_uart_address_from_devcfg() ==
+	       fdtdec_get_addr_size(gd->fdt_blob, node, "reg", NULL);
+}
+
+/*
+ * ft_board_setup - fix up the devicetree handed to the OS
  *
  * arch_fixup_fdt() / spin_table_update_dt() overwrites cpu-release-addr
  * with U-Boot's relocated address.  Restore the pre-relocation physical
- * address so secondary cores spin on the correct location.
+ * address so secondary cores spin on the correct location.  Also override
+ * the arch-timer rate and, when dev-cfg selects UART4, point the console
+ * at it.
  */
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
@@ -98,6 +115,43 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 			printf("WARNING: Failed to set timer clock-frequency\n");
 		else
 			printf("fdt board setup: timer clock-frequency = %u Hz\n", freq);
+	}
+
+	/*
+	 * The console UART is selected at runtime from the dev-cfg handoff
+	 * blob, so hand the kernel a matching devicetree: disable uart3 so no
+	 * ttyPS3 is registered, and repoint stdout-path, which is what a bare
+	 * "earlycon" resolves through (console= only takes effect once the
+	 * real driver probes). The blob has CONFIG_SYS_FDT_PAD headroom here,
+	 * so growing "okay" to "disabled" is safe.
+	 */
+	if (uart4_is_console()) {
+		offset = fdt_path_offset(blob, "serial3");	/* uses the alias */
+		if (offset >= 0) {
+			ret = fdt_setprop_string(blob, offset, "status",
+						 "disabled");
+			if (ret)
+				printf("WARNING: Failed to disable uart3 (%d)\n",
+				       ret);
+		}
+
+		offset = fdt_path_offset(blob, "/chosen");
+		if (offset >= 0) {
+			ret = fdt_setprop_string(blob, offset, "stdout-path",
+						 "serial4:115200");
+			if (ret)
+				printf("WARNING: Failed to set stdout-path (%d)\n",
+				       ret);
+		}
+	} else {
+		offset = fdt_path_offset(blob, "serial4");	/* uses the alias */
+		if (offset >= 0) {
+			ret = fdt_setprop_string(blob, offset, "status",
+						 "disabled");
+			if (ret)
+				printf("WARNING: Failed to disable uart4 (%d)\n",
+				       ret);
+		}
 	}
 
 	return 0;
@@ -164,6 +218,7 @@ int board_init(void)
 	 * ran at EL3). timer_init itself runs pre-console, so it can't print. */
 	printf("board_init: dev-cfg counter freq = %u Hz, CNTFRQ_EL0 = %u Hz (EL%u)\n",
 	       ax_counter_freq_from_devcfg(), raw_read_cntfrq_el0(), current_el());
+	printf("dev-cfg UART address = 0x%x\n", get_uart_address_from_devcfg());
 	return 0;
 }
 
@@ -237,6 +292,11 @@ int board_late_init(void)
 			printf("WARNING: Failed to write default environment (%d)\n",
 			       ret);
 	}
+
+	/* console=ttyPS3 --> console=ttyPS4 when dev-cfg selects UART4 */
+	if (uart4_is_console())
+		env_set("bootargs", AX_BOOTARGS_UART4);
+
 	return 0;
 }
 
@@ -267,4 +327,26 @@ void set_pad_before_kernel_state(void)
 void board_preboot_os(void)
 {
 	set_pad_before_kernel_state();
+}
+
+int board_early_init_f(void)
+{
+	void *blob = (void *)gd->fdt_blob;
+	const char *path = "serial4:115200";
+	int chosen;
+
+	/*
+	 * This runs before relocate_code(), so nothing here may write a global
+	 * or static variable: .bss is linked over .rela.dyn (both start at
+	 * __rel_dyn_start), so such a store lands on a relocation entry and
+	 * wedges relocate_code() before board_init_r() can report anything.
+	 * Keep the result local; post-relocation consumers must re-derive it.
+	 */
+	if (uart4_is_console()) {
+		fdt_open_into(blob, blob, fdt_totalsize(blob) + 64); /* headroom for the string */
+		chosen = fdt_path_offset(blob, "/chosen");
+		fdt_setprop_string(blob, chosen, "stdout-path", path);
+	}
+
+	return 0;
 }
