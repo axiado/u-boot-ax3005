@@ -161,6 +161,27 @@ static u32 cdns_i2c_wait(struct cdns_i2c_regs *cdns_i2c, u32 mask)
 	return int_status & mask;
 }
 
+/*
+ * Return the controller to idle after a failed transfer: release the bus,
+ * flush the FIFO and clear any latched status, as the Linux driver does in
+ * cdns_i2c_master_reset(). Without this a stale HOLD bit or FIFO contents
+ * from one failed transfer break every later one.
+ */
+static void cdns_i2c_master_reset(struct cdns_i2c_regs *regs)
+{
+	/* Disable the interrupts */
+	writel(CDNS_I2C_INTERRUPTS_MASK, &regs->interrupt_disable);
+	/* Clear the hold bit and FIFOs */
+	clrsetbits_le32(&regs->control, CDNS_I2C_CONTROL_HOLD,
+			CDNS_I2C_CONTROL_CLR_FIFO);
+	/* Update the transfer count register to zero */
+	writel(0, &regs->transfer_size);
+	/* Clear the interrupt status register */
+	writel(readl(&regs->interrupt_status), &regs->interrupt_status);
+	/* Clear the status register */
+	writel(readl(&regs->status), &regs->status);
+}
+
 #define CDNS_I2C_DIVA_MAX	4
 #define CDNS_I2C_DIVB_MAX	64
 
@@ -452,6 +473,9 @@ static int cdns_i2c_xfer(struct udevice *dev, struct i2c_msg *msg,
 	for (u8 retry = 0; retry < CDNS_I2C_ARB_LOST_MAX_RETRIES &&
 	     nmsgs > 0;) {
 		debug("i2c_xfer: chip=0x%x, len=0x%x\n", msg->addr, msg->len);
+		/* Release the bus (send STOP) after the last message */
+		if (nmsgs == 1)
+			i2c_bus->hold_flag = 0;
 		if (msg->flags & I2C_M_RD) {
 			ret = cdns_i2c_read_data(i2c_bus, msg->addr, msg->buf,
 						 msg->len);
@@ -460,12 +484,19 @@ static int cdns_i2c_xfer(struct udevice *dev, struct i2c_msg *msg,
 						  msg->len);
 		}
 
-		if (ret == -ETIMEDOUT)
+		if (ret == -ETIMEDOUT) {
+			cdns_i2c_master_reset(i2c_bus->regs);
 			return ret;
+		}
 
 		if (ret == -EAGAIN) {
+			cdns_i2c_master_reset(i2c_bus->regs);
 			msg = message;
 			nmsgs = num_msgs;
+			i2c_bus->hold_flag = num_msgs > 1;
+			if (i2c_bus->hold_flag)
+				setbits_le32(&i2c_bus->regs->control,
+					     CDNS_I2C_CONTROL_HOLD);
 			retry++;
 			printf("%s,arbitration lost, retrying:%d\n", __func__,
 			       retry);
