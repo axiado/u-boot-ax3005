@@ -38,3 +38,7 @@
 &mac0 {
 	status = "okay";
 };
+
+&i2c16 {
+	status = "okay";
+};
