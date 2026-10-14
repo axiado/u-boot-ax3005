@@ -8,7 +8,9 @@
 #define _RELOCATE_H_
 
 #ifndef USE_HOSTCC
+#include <asm/global_data.h>
 
+DECLARE_GLOBAL_DATA_PTR;
 #endif
 
 /**

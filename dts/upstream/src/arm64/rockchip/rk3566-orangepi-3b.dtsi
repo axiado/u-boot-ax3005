@@ -435,11 +435,6 @@
 	};
 };
 
-&i2c2 {
-	pinctrl-0 = <&i2c2m1_xfer>;
-	status = "okay";
-};
-
 &i2s0_8ch {
 	status = "okay";
 };

@@ -192,7 +192,6 @@ out:
 }
 
 static int total_sector;
-#if !IS_ENABLED(CONFIG_FS_FAT_HANDLE_SECTOR_SIZE_MISMATCH)
 static int disk_write(__u32 block, __u32 nr_blocks, void *buf)
 {
 	ulong ret;
@@ -212,7 +211,6 @@ static int disk_write(__u32 block, __u32 nr_blocks, void *buf)
 
 	return ret;
 }
-#endif /* CONFIG_FS_FAT_HANDLE_SECTOR_SIZE_MISMATCH */
 
 /*
  * Write fat buffer into block device
@@ -225,9 +223,9 @@ static int flush_dirty_fat_buffer(fsdata *mydata)
 	__u32 startblock = mydata->fatbufnum * FATBUFBLOCKS;
 
 	debug("debug: evicting %d, dirty: %d\n", mydata->fatbufnum,
-	      (int)fat_is_dirty(mydata));
+	      (int)mydata->fat_dirty);
 
-	if (!fat_is_dirty(mydata) || (mydata->fatbufnum == -1))
+	if ((!mydata->fat_dirty) || (mydata->fatbufnum == -1))
 		return 0;
 
 	/* Cap length if fatlength is not a multiple of FATBUFBLOCKS */
@@ -250,7 +248,7 @@ static int flush_dirty_fat_buffer(fsdata *mydata)
 			return -1;
 		}
 	}
-	fat_mark_clean(mydata);
+	mydata->fat_dirty = 0;
 
 	return 0;
 }
@@ -486,7 +484,8 @@ static int set_fatent_value(fsdata *mydata, __u32 entry, __u32 entry_value)
 		mydata->fatbufnum = bufnum;
 	}
 
-	fat_mark_dirty(mydata);
+	/* Mark as dirty */
+	mydata->fat_dirty = 1;
 
 	/* Set the actual entry */
 	switch (mydata->fatsize) {

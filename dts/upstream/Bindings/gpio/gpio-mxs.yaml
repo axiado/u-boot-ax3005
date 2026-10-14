@@ -28,7 +28,6 @@ properties:
 
   '#address-cells':
     const: 1
-
   '#size-cells':
     const: 0
 
@@ -36,7 +35,7 @@ properties:
     maxItems: 1
 
 patternProperties:
-  '^(?!gpio@)[^@]+@[0-9]+$':
+  "^(?!gpio@)[^@]+@[0-9]+$":
     type: object
     properties:
       fsl,pinmux-ids:
@@ -94,7 +93,7 @@ patternProperties:
 
     additionalProperties: false
 
-  '^gpio@[0-9]+$':
+  "^gpio@[0-9]+$":
     type: object
     properties:
       compatible:
@@ -111,10 +110,10 @@ patternProperties:
 
       interrupt-controller: true
 
-      '#interrupt-cells':
+      "#interrupt-cells":
         const: 2
 
-      '#gpio-cells':
+      "#gpio-cells":
         const: 2
 
       gpio-controller: true
@@ -124,8 +123,8 @@ patternProperties:
       - reg
       - interrupts
       - interrupt-controller
-      - '#interrupt-cells'
-      - '#gpio-cells'
+      - "#interrupt-cells"
+      - "#gpio-cells"
       - gpio-controller
 
     additionalProperties: false

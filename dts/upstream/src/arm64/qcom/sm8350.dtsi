@@ -2051,7 +2051,7 @@
 
 			status = "disabled";
 
-			gpu_zap_shader: zap-shader {
+			zap-shader {
 				memory-region = <&pil_gpu_mem>;
 			};
 

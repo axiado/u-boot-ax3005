@@ -49,7 +49,7 @@ additionalProperties: false
 examples:
   - |
     #include <dt-bindings/interrupt-controller/irq.h>
-    i2c {
+    i2c2 {
         #address-cells = <1>;
         #size-cells = <0>;
 

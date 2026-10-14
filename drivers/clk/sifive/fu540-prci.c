@@ -59,25 +59,25 @@ static const struct __prci_clock_ops sifive_fu540_prci_tlclksel_clk_ops = {
 
 /* List of clock controls provided by the PRCI */
 static struct __prci_clock __prci_init_clocks_fu540[] = {
-	[FU540_PRCI_CLK_COREPLL] = {
+	[PRCI_CLK_COREPLL] = {
 		.name = "corepll",
 		.parent_name = "hfclk",
 		.ops = &sifive_fu540_prci_wrpll_clk_ops,
 		.pwd = &__prci_corepll_data,
 	},
-	[FU540_PRCI_CLK_DDRPLL] = {
+	[PRCI_CLK_DDRPLL] = {
 		.name = "ddrpll",
 		.parent_name = "hfclk",
 		.ops = &sifive_fu540_prci_wrpll_clk_ops,
 		.pwd = &__prci_ddrpll_data,
 	},
-	[FU540_PRCI_CLK_GEMGXLPLL] = {
+	[PRCI_CLK_GEMGXLPLL] = {
 		.name = "gemgxlpll",
 		.parent_name = "hfclk",
 		.ops = &sifive_fu540_prci_wrpll_clk_ops,
 		.pwd = &__prci_gemgxlpll_data,
 	},
-	[FU540_PRCI_CLK_TLCLK] = {
+	[PRCI_CLK_TLCLK] = {
 		.name = "tlclk",
 		.parent_name = "corepll",
 		.ops = &sifive_fu540_prci_tlclksel_clk_ops,

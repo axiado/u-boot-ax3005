@@ -296,9 +296,8 @@
 };
 
 &spi1 {
-	pinctrl-names = "default", "sleep";
+	pinctrl-names = "default";
 	pinctrl-0 = <&spi1_pins_a>;
-	pinctrl-1 = <&spi1_sleep_pins_a>;
 	status = "disabled";
 };
 

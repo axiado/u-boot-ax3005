@@ -317,6 +317,7 @@ allOf:
       properties:
         clocks: false
 
+
 examples:
   - |
     #include <dt-bindings/clock/rk3399-cru.h>

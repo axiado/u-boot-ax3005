@@ -206,7 +206,6 @@ static void dwc3_free_one_event_buffer(struct dwc3 *dwc,
 		struct dwc3_event_buffer *evt)
 {
 	dma_free_coherent(evt->buf);
-	free(evt);
 }
 
 /**
@@ -253,8 +252,6 @@ static void dwc3_free_event_buffers(struct dwc3 *dwc)
 		if (evt)
 			dwc3_free_one_event_buffer(dwc, evt);
 	}
-
-	free(dwc->ev_buffs);
 }
 
 /**

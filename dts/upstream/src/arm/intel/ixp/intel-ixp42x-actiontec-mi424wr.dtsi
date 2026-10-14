@@ -152,6 +152,7 @@
 				};
 				ethernet-port@4 {
 					reg = <4>;
+					ethernet = <&ethc>;
 					phy-mode = "mii";
 					fixed-link {
 						speed = <100>;

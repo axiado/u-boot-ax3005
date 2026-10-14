@@ -15,6 +15,9 @@
 #include <bzlib.h>
 #include <watchdog.h>
 #include <asm/byteorder.h>
+#ifdef CONFIG_SHOW_BOOT_PROGRESS
+# include <status_led.h>
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -61,8 +64,6 @@ int do_bootm_linux(int flag, struct bootm_info *bmi)
 	      (ulong) kernel);
 
 	bootstage_mark(BOOTSTAGE_ID_RUN_OS);
-
-	bootm_final(0);
 
 	/*
 	 * Linux Kernel Parameters (passing board info data):

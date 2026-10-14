@@ -8,6 +8,7 @@
 #include <dm.h>
 #include <mapmem.h>
 #include <string.h>
+#include <asm/global_data.h>
 #include <asm/sandbox_arm_ffa.h>
 #include <asm/sandbox_arm_ffa_priv.h>
 #include <dm/device-internal.h>
@@ -15,6 +16,8 @@
 #include <dm/root.h>
 #include <linux/errno.h>
 #include <linux/sizes.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /* The partitions (SPs) table */
 static struct ffa_partition_desc sandbox_partitions[SANDBOX_PARTITIONS_CNT] = {

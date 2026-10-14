@@ -243,7 +243,7 @@ static const struct udevice_id bcm2835_sdhci_match[] = {
 	{ /* sentinel */ }
 };
 
-U_BOOT_DRIVER(sdhci_bcm2835) = {
+U_BOOT_DRIVER(sdhci_cdns) = {
 	.name = "sdhci-bcm2835",
 	.id = UCLASS_MMC,
 	.of_match = bcm2835_sdhci_match,

@@ -173,13 +173,12 @@ int fdt_fixup_reserved(void *blob)
 	int ret;
 
 	ret = fdt_fixup_reserved_memory(blob, "tfa", CONFIG_K3_ATF_LOAD_ADDR,
-					CONFIG_K3_ATF_RESERVED_SIZE);
+					0x80000);
 	if (ret)
 		return ret;
 
 	return fdt_fixup_reserved_memory(blob, "optee",
-					 CONFIG_K3_OPTEE_LOAD_ADDR,
-					 CONFIG_K3_OPTEE_RESERVED_SIZE);
+					 CONFIG_K3_OPTEE_LOAD_ADDR, 0x1800000);
 }
 
 static int fdt_fixup_critical_trips(void *blob, int zoneoffset, int maxc)

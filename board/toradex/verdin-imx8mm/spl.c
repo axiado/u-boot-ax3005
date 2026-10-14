@@ -11,6 +11,7 @@
 #include <asm/arch/ddr.h>
 #include <asm/arch/imx8mm_pins.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/iomux-v3.h>
@@ -25,6 +26,8 @@
 #include <power/pca9450.h>
 #include <power/pmic.h>
 #include <spl.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define I2C_PMIC_BUS_ID        1
 

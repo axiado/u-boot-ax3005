@@ -1,13 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0
 
 config USB_ISP1760
-	bool "NXP ISP 1760/1761/1763 support"
-	depends on DM && OF_CONTROL
+	tristate "NXP ISP 1760/1761/1763 support"
 	select DM_USB
-	select REGMAP
 	select USB_HOST
 	help
-	  Say Y here if your system as an ISP1760/1761/1763 USB host
+	  Say Y or M here if your system as an ISP1760/1761/1763 USB host
 	  controller.
 
 	  This USB controller is usually attached to a non-DMA-Master

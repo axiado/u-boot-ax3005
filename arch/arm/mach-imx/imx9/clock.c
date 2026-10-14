@@ -10,6 +10,7 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/ccm_regs.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <div64.h>
 #include <errno.h>
@@ -17,6 +18,8 @@
 #include <linux/delay.h>
 #include <log.h>
 #include <phy.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static struct anatop_reg *ana_regs = (struct anatop_reg *)ANATOP_BASE_ADDR;
 

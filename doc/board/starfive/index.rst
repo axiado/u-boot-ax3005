@@ -10,6 +10,5 @@ StarFive
    milk-v_mars
    milkv_marscm_emmc
    milkv_marscm_lite
-   orangepi_rv
    pine64_star64
    visionfive2

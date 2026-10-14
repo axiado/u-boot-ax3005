@@ -4,9 +4,12 @@
  */
 
 #include <log.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/arch/iomux.h>
 #include <firmware/imx/sci/sci.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /*
  * configures a single pad in the iomuxer

@@ -79,7 +79,7 @@ allOf:
         required:
           - value
 
-      anyOf:
+      oneOf:
         - required: [offset]
         - required: [reg]
 

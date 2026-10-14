@@ -591,7 +591,7 @@ rm-cfg:
             reserved: 0
         -
             start_resource: 1297
-            num_resource: 238
+            num_resource: 239
             type: 1805
             host_id: 128
             reserved: 0

@@ -49,10 +49,6 @@
 	};
 };
 
-&usb_con {
-	power-role = "sink";
-};
-
 &usbdp_phy0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&usbc_sbu_dc>;

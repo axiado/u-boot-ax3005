@@ -17,7 +17,6 @@ properties:
   compatible:
     enum:
       - airoha,en7581-eth
-      - airoha,an7583-eth
 
   reg:
     items:
@@ -45,7 +44,6 @@ properties:
       - description: PDMA irq
 
   resets:
-    minItems: 7
     maxItems: 8
 
   reset-names:
@@ -56,9 +54,8 @@ properties:
       - const: xsi-mac
       - const: hsi0-mac
       - const: hsi1-mac
-      - enum: [ hsi-mac, xfp-mac ]
+      - const: hsi-mac
       - const: xfp-mac
-    minItems: 7
 
   memory-region:
     items:
@@ -83,36 +80,6 @@ properties:
       The Airoha Network Processor Unit (NPU) provides a configuration
       interface to implement hardware flow offloading programming Packet
       Processor Engine (PPE) flow table.
-
-allOf:
-  - $ref: ethernet-controller.yaml#
-  - if:
-      properties:
-        compatible:
-          contains:
-            enum:
-              - airoha,en7581-eth
-    then:
-      properties:
-        resets:
-          minItems: 8
-
-        reset-names:
-          minItems: 8
-
-  - if:
-      properties:
-        compatible:
-          contains:
-            enum:
-              - airoha,an7583-eth
-    then:
-      properties:
-        resets:
-          maxItems: 7
-
-        reset-names:
-          maxItems: 7
 
 patternProperties:
   "^ethernet@[1-4]$":

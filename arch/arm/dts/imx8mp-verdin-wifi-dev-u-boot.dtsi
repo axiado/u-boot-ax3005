@@ -70,7 +70,7 @@
 };
 
 &i2c1 {
-	bootph-all;
+	bootph-pre-ram;
 
 	eeprom_module: eeprom@50 {
 		compatible = "i2c-eeprom";
@@ -104,7 +104,7 @@
 };
 
 &pca9450 {
-	bootph-all;
+	bootph-pre-ram;
 };
 
 &pinctrl_ctrl_sleep_moci {
@@ -112,11 +112,7 @@
 };
 
 &pinctrl_i2c1 {
-	bootph-all;
-};
-
-&pinctrl_pmic {
-	bootph-all;
+	bootph-pre-ram;
 };
 
 &pinctrl_usdhc2_pwr_en {
@@ -163,12 +159,6 @@
 	sd-uhs-ddr50;
 	sd-uhs-sdr104;
 	bootph-pre-ram;
-	/*
-	 * LDO5 output depends on SD2_VSEL, but no way to read back SD2_VSEL
-	 * when using SDHC controller VSELECT to control SD2_VSEL. So drop
-	 * vqmmc-supply to avoid fsl_esdhc_imx read back wrong voltage.
-	 */
-	 /delete-property/ vqmmc-supply;
 };
 
 &usdhc3 {
@@ -182,8 +172,4 @@
 
 &wdog1 {
 	bootph-pre-ram;
-};
-
-&{/soc@0/bus@30800000/i2c@30a20000/pmic@25/regulators} {
-	bootph-all;
 };

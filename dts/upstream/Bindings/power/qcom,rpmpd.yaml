@@ -18,7 +18,6 @@ properties:
     oneOf:
       - enum:
           - qcom,glymur-rpmhpd
-          - qcom,kaanapali-rpmhpd
           - qcom,mdm9607-rpmpd
           - qcom,milos-rpmhpd
           - qcom,msm8226-rpmpd

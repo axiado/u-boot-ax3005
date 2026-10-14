@@ -14,8 +14,6 @@
 #include "sc8180x.dtsi"
 #include "sc8180x-pmics.dtsi"
 
-/delete-node/ &gpu_mem;
-
 / {
 	model = "Qualcomm SC8180x Primus";
 	compatible = "qcom,sc8180x-primus", "qcom,sc8180x";
@@ -444,10 +442,11 @@
 
 &gpu {
 	status = "okay";
-};
 
-&gpu_zap_shader {
-	firmware-name = "qcom/sc8180x/qcdxkmsuc8180.mbn";
+	zap-shader {
+		memory-region = <&gpu_mem>;
+		firmware-name = "qcom/sc8180x/qcdxkmsuc8180.mbn";
+	};
 };
 
 &i2c1 {

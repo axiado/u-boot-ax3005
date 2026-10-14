@@ -16,6 +16,7 @@
 #include <power-domain.h>
 #include <reset.h>
 #include <syscon.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm-generic/gpio.h>
 #include <dm/device_compat.h>
@@ -25,6 +26,8 @@
 #include <linux/bitfield.h>
 
 #include "pcie_dw_common.h"
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /**
  * struct meson_pcie - Amlogic Meson DW PCIe controller state

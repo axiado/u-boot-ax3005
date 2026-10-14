@@ -198,7 +198,7 @@ static int flags_remove(uint flags, uint drv_flags)
 int device_remove(struct udevice *dev, uint flags)
 {
 	const struct driver *drv;
-	int ret, cret;
+	int ret;
 
 	if (!dev)
 		return -EINVAL;
@@ -211,34 +211,24 @@ int device_remove(struct udevice *dev, uint flags)
 		return ret;
 
 	/*
+	 * If the child returns EKEYREJECTED, continue. It just means that it
+	 * didn't match the flags.
+	 */
+	ret = device_chld_remove(dev, NULL, flags);
+	if (ret && ret != -EKEYREJECTED)
+		return ret;
+
+	/*
 	 * Remove the device if called with the "normal" remove flag set,
 	 * or if the remove flag matches any of the drivers remove flags
 	 */
 	drv = dev->driver;
 	assert(drv);
-	cret = flags_remove(flags, drv->flags);
-
-	/*
-	 * Remove all children. If this device is being removed due to
-	 * active-DMA or OS-prepare flags, drop the active-flag requirement
-	 * for children so they are removed even without matching active
-	 * flags, since a deactivated device must not have activated
-	 * children. Preserve other flags (e.g. DM_REMOVE_NON_VITAL) so
-	 * that vital children are still protected.
-	 *
-	 * If the child returns EKEYREJECTED, continue. It just means that it
-	 * didn't match the flags.
-	 */
-	ret = device_chld_remove(dev, NULL,
-				 cret ? flags :
-				 (flags & ~DM_REMOVE_ACTIVE_ALL));
-	if (ret && ret != -EKEYREJECTED)
-		return ret;
-
-	if (cret) {
+	ret = flags_remove(flags, drv->flags);
+	if (ret) {
 		log_debug("%s: When removing: flags=%x, drv->flags=%x, err=%d\n",
-			  dev->name, flags, drv->flags, cret);
-		return cret;
+			  dev->name, flags, drv->flags, ret);
+		return ret;
 	}
 
 	ret = uclass_pre_remove_device(dev);

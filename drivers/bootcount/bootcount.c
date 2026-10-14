@@ -19,8 +19,7 @@ __weak void bootcount_store(ulong a)
 	uintptr_t flush_end;
 
 #if defined(CONFIG_SYS_BOOTCOUNT_SINGLEWORD)
-	raw_bootcount_store(reg, (CONFIG_SYS_BOOTCOUNT_MAGIC & BOOTCOUNT_MAGIC_MASK)
-		| (a & BOOTCOUNT_COUNT_MASK));
+	raw_bootcount_store(reg, (CONFIG_SYS_BOOTCOUNT_MAGIC & 0xffff0000) | a);
 
 	flush_end = roundup(CONFIG_SYS_BOOTCOUNT_ADDR + 4,
 			    CONFIG_SYS_CACHELINE_SIZE);
@@ -41,10 +40,10 @@ __weak ulong bootcount_load(void)
 #if defined(CONFIG_SYS_BOOTCOUNT_SINGLEWORD)
 	u32 tmp = raw_bootcount_load(reg);
 
-	if ((tmp & BOOTCOUNT_MAGIC_MASK) != (CONFIG_SYS_BOOTCOUNT_MAGIC & BOOTCOUNT_MAGIC_MASK))
+	if ((tmp & 0xffff0000) != (CONFIG_SYS_BOOTCOUNT_MAGIC & 0xffff0000))
 		return 0;
 	else
-		return (tmp & BOOTCOUNT_COUNT_MASK);
+		return (tmp & 0x0000ffff);
 #else
 	if (raw_bootcount_load(reg + 4) != CONFIG_SYS_BOOTCOUNT_MAGIC)
 		return 0;
@@ -75,10 +74,10 @@ static int bootcount_mem_get(struct udevice *dev, u32 *a)
 	if (priv->singleword) {
 		u32 tmp = raw_bootcount_load(reg);
 
-		if ((tmp & BOOTCOUNT_MAGIC_MASK) != (magic & BOOTCOUNT_MAGIC_MASK))
+		if ((tmp & 0xffff0000) != (magic & 0xffff0000))
 			return -ENODEV;
 
-		*a = (tmp & BOOTCOUNT_COUNT_MASK);
+		*a = (tmp & 0x0000ffff);
 	} else {
 		if (raw_bootcount_load(reg + 4) != magic)
 			return -ENODEV;
@@ -99,8 +98,7 @@ static int bootcount_mem_set(struct udevice *dev, const u32 a)
 	uintptr_t flush_end;
 
 	if (priv->singleword) {
-		raw_bootcount_store(reg, (magic & BOOTCOUNT_MAGIC_MASK)
-			| (a & BOOTCOUNT_COUNT_MASK));
+		raw_bootcount_store(reg, (magic & 0xffff0000) | a);
 		flush_end = roundup(priv->base + 4,
 				    CONFIG_SYS_CACHELINE_SIZE);
 	} else {

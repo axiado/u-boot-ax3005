@@ -99,6 +99,7 @@ properties:
       the datasheet.
     const: 1
 
+
 required:
   - compatible
   - reg

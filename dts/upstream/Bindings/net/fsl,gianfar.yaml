@@ -167,6 +167,8 @@ allOf:
             - description: Receive interrupt
             - description: Error interrupt
 
+
+
 unevaluatedProperties: false
 
 examples:

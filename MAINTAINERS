@@ -333,7 +333,6 @@ F:	doc/imx/
 F:	drivers/mailbox/imx-mailbox.c
 F:	drivers/remoteproc/imx*
 F:	drivers/serial/serial_mxc.c
-F:	drivers/spi/nxp_xspi.c
 F:	include/imx_container.h
 
 ARM HISILICON
@@ -371,7 +370,7 @@ F:	drivers/rng/msm_rng.c
 F:	drivers/pinctrl/qcom/pinctrl-ipq4019.c
 
 ARM LAYERSCAPE SFP
-M:	Sean Anderson <sean.anderson@linux.dev>
+M:	Sean Anderson <sean.anderson@seco.com>
 S:	Maintained
 F:	drivers/misc/ls2_sfp.c
 
@@ -425,10 +424,7 @@ M:	Ryder Lee <ryder.lee@mediatek.com>
 M:	Weijie Gao <weijie.gao@mediatek.com>
 M:	Chunfeng Yun <chunfeng.yun@mediatek.com>
 M:	Igor Belwon <igor.belwon@mentallysanemainliners.org>
-M:	David Lechner <dlechner@baylibre.com>
-M:	Julien Stephan <jstephan@baylibre.com>
 R:	GSS_MTK_Uboot_upstream <GSS_MTK_Uboot_upstream@mediatek.com>
-T:	git https://source.denx.de/u-boot/custodians/u-boot-mediatek.git
 S:	Maintained
 F:	arch/arm/dts/mt*
 F:	arch/arm/mach-mediatek/
@@ -446,8 +442,6 @@ F:	drivers/net/phy/mediatek/
 F:	drivers/phy/phy-mtk-*
 F:	drivers/pinctrl/mediatek/
 F:	drivers/power/domain/mtk-power-domain.c
-F:	drivers/power/pmic/mtk-pwrap.c
-F:	drivers/power/regulator/mt*.c
 F:	drivers/pci/pcie_mediatek_gen3.c
 F:	drivers/pci/pcie_mediatek.c
 F:	drivers/pwm/pwm-mtk.c
@@ -464,7 +458,6 @@ F:	drivers/reset/reset-mediatek.c
 F:	drivers/serial/serial_mtk.c
 F:	include/dt-bindings/clock/mediatek,*
 F:	include/dt-bindings/power/mediatek,*
-F:	include/power/mt*.h
 F:	tools/mtk_image.c
 F:	tools/mtk_image.h
 F:	tools/mtk_nand_headers.c
@@ -650,7 +643,7 @@ L:	linux@analog.com
 S:	Supported
 T:	git https://github.com/analogdevicesinc/u-boot
 F:	arch/arm/dts/sc5*
-F:	arch/arm/include/asm/arch-sc5xx/
+F:	arch/arm/include/asm/arch-adi/
 F:	arch/arm/mach-sc5xx/
 F:	board/adi/
 F:	configs/sc5*
@@ -1254,16 +1247,11 @@ F:	drivers/watchdog/sbsa_gwdt.c
 
 FWU Multi Bank Update
 M:	Sughosh Ganu <sughosh.ganu@arm.com>
-M:	Kory Maincent <kory.maincent@bootlin.com>
 S:	Maintained
 T:	git https://source.denx.de/u-boot/custodians/u-boot-efi.git
-F:	doc/fwumdata.1
-F:	doc/mkfwumdata.1
 F:	lib/fwu_updates/*
 F:	drivers/fwu-mdata/*
-F:	tools/fwumdata_src/fwumdata.c
-F:	tools/fwumdata_src/fwumdata.h
-F:	tools/fwumdata_src/mkfwumdata.c
+F:	tools/mkfwumdata.c
 
 GATEWORKS_SC
 M:	Tim Harvey <tharvey@gateworks.com>
@@ -1403,10 +1391,7 @@ F:	drivers/net/phy/ca_phy.c
 
 MIPS MEDIATEK
 M:	Weijie Gao <weijie.gao@mediatek.com>
-M:	David Lechner <dlechner@baylibre.com>
-M:	Julien Stephan <jstephan@baylibre.com>
 R:	GSS_MTK_Uboot_upstream <GSS_MTK_Uboot_upstream@mediatek.com>
-T:	git https://source.denx.de/u-boot/custodians/u-boot-mediatek.git
 S:	Maintained
 F:	arch/mips/mach-mtmips/
 F:	arch/mips/dts/mt7620.dtsi
@@ -1710,7 +1695,7 @@ F:	doc/usage/cmd/seama.rst
 F:	test/cmd/seama.c
 
 SEMIHOSTING
-R:	Sean Anderson <sean.anderson@linux.dev>
+R:	Sean Anderson <sean.anderson@seco.com>
 S:	Orphaned
 N:	semihosting
 
@@ -1792,15 +1777,13 @@ F:	drivers/spmi/
 F:	include/spmi/
 
 SQUASHFS
-M:	Joao Marcos Costa <joaomarcos.costa@bootlin.com>
-M:	Richard Genoud <richard.genoud@bootlin.com>
+M:	Joao Marcos Costa <jmcosta944@gmail.com>
 R:	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 R:	Miquel Raynal <miquel.raynal@bootlin.com>
 S:	Maintained
-F:	cmd/sqfs.c
-F:	common/spl/spl_squashfs.c
 F:	fs/squashfs/
 F:	include/sqfs.h
+F:	cmd/sqfs.c
 F:	test/py/tests/test_fs/test_squashfs/
 
 STACKPROTECTOR
@@ -1868,14 +1851,10 @@ F:	drivers/tpm/
 F:	include/tpm*
 F:	lib/tpm*
 
-TQ-SYSTEMS
-L:	u-boot@ew.tq-group.com
-S:	Maintained
-W:	https://www.tq-group.com/en/products/tq-embedded/
-F:	board/tq/*
-F:	doc/board/tq/*
-F:	include/configs/tq*.h
-F:	include/env/tq/*
+TQ GROUP
+#M:	Martin Krause <martin.krause@tq-systems.de>
+S:	Orphaned (Since 2016-02)
+T:	git git://git.denx.de/u-boot-tq-group.git
 
 TEE
 M:	Jens Wiklander <jens.wiklander@linaro.org>
@@ -1917,7 +1896,6 @@ M:	Neil Armstrong <neil.armstrong@linaro.org>
 M:	Bhupesh Sharma <bhupesh.linux@gmail.com>
 M:	Neha Malcom Francis <n-francis@ti.com>
 S:	Maintained
-F:	common/spl/spl_ufs.c
 F:	drivers/ufs/
 
 UPL

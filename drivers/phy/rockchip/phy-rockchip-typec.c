@@ -10,6 +10,7 @@
 
 #include <clk.h>
 #include <dm.h>
+#include <asm/global_data.h>
 #include <dm/device_compat.h>
 #include <dm/lists.h>
 #include <generic-phy.h>
@@ -19,6 +20,8 @@
 #include <asm/io.h>
 #include <linux/iopoll.h>
 #include <asm/arch-rockchip/clock.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define usleep_range(a, b) udelay((b))
 

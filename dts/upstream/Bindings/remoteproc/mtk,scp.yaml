@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Mediatek SCP
 
 maintainers:
-  - AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+  - Tinghan Shen <tinghan.shen@mediatek.com>
 
 description:
   This binding provides support for ARM Cortex M4 Co-processor found on some

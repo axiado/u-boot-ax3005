@@ -20,7 +20,6 @@ properties:
               - fsl,imx8qm-irqsteer
               - fsl,imx8qxp-irqsteer
               - fsl,imx94-irqsteer
-              - fsl,imx95-irqsteer
           - const: fsl,imx-irqsteer
 
   reg:
@@ -88,7 +87,6 @@ allOf:
               - fsl,imx8mp-irqsteer
               - fsl,imx8qm-irqsteer
               - fsl,imx8qxp-irqsteer
-              - fsl,imx95-irqsteer
     then:
       required:
         - power-domains

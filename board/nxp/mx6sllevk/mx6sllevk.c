@@ -76,6 +76,11 @@ int power_init_board(void)
 }
 #endif
 
+int board_early_init_f(void)
+{
+	return 0;
+}
+
 int board_init(void)
 {
 	/* Address of boot parameters */

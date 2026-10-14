@@ -182,14 +182,18 @@ static int ufs_mtk_bind_mphy(struct ufs_hba *hba)
 	struct ufs_mtk_host *host = dev_get_priv(hba->dev);
 	int err = 0;
 
-	err = generic_phy_get_by_index(hba->dev, 0, &host->mphy);
+	err = generic_phy_get_by_index(hba->dev, 0, host->mphy);
 
-	if (err) {
-		if (err == -ENOENT)
-			return 0; /* no PHY, nothing to do */
-		dev_err(hba->dev, "Failed to get PHY: %d.\n", err);
-		return err;
+	if (IS_ERR(host->mphy)) {
+		err = PTR_ERR(host->mphy);
+		if (err != -ENODEV) {
+			dev_info(hba->dev, "%s: Could NOT get a valid PHY %d\n", __func__,
+				 err);
+		}
 	}
+
+	if (err)
+		host->mphy = NULL;
 
 	return err;
 }
@@ -317,35 +321,19 @@ static int ufs_mtk_init(struct ufs_hba *hba)
 
 	ufs_mtk_init_reset(hba);
 
-	err = clk_get_bulk(hba->dev, &priv->clks);
-	if (err) {
-		dev_err(hba->dev, "failed to initialize clocks, err:%d\n", err);
-		return err;
-	}
+	// TODO: Clocking
 
-	err = clk_enable_bulk(&priv->clks);
-	if (err) {
-		dev_err(hba->dev, "failed to enable clocks, err:%d\n", err);
-		goto err_clk_enable;
-	}
-
-	err = generic_phy_power_on(&priv->mphy);
+	err = generic_phy_power_on(priv->mphy);
 	if (err) {
 		dev_err(hba->dev, "%s: phy init failed, err = %d\n",
 			__func__, err);
-		goto err_phy_power_on;
+		return err;
 	}
 
 	ufs_mtk_setup_ref_clk(hba, true);
 	ufs_mtk_get_hw_ip_version(hba);
 
 	return 0;
-
-err_phy_power_on:
-	clk_disable_bulk(&priv->clks);
-err_clk_enable:
-	clk_release_bulk(&priv->clks);
-	return err;
 }
 
 static int ufs_mtk_device_reset(struct ufs_hba *hba)
@@ -395,9 +383,7 @@ static int ufs_mtk_probe(struct udevice *dev)
 
 static const struct udevice_id ufs_mtk_ids[] = {
 	{ .compatible = "mediatek,mt6878-ufshci" },
-	{ .compatible = "mediatek,mt8183-ufshci" },
-	{ .compatible = "mediatek,mt8195-ufshci" },
-	{ }
+	{},
 };
 
 U_BOOT_DRIVER(mediatek_ufshci) = {

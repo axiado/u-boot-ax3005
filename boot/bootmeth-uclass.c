@@ -19,6 +19,8 @@
 #include <mapmem.h>
 #include <dm/uclass-internal.h>
 
+DECLARE_GLOBAL_DATA_PTR;
+
 int bootmeth_get_state_desc(struct udevice *dev, char *buf, int maxsize)
 {
 	const struct bootmeth_ops *ops = bootmeth_get_ops(dev);

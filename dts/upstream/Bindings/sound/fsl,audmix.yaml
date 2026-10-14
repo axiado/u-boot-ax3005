@@ -34,9 +34,7 @@ description: |
 
 properties:
   compatible:
-    enum:
-      - fsl,imx8qm-audmix
-      - fsl,imx952-audmix
+    const: fsl,imx8qm-audmix
 
   reg:
     maxItems: 1
@@ -82,17 +80,7 @@ required:
   - reg
   - clocks
   - clock-names
-
-allOf:
-  - if:
-      properties:
-        compatible:
-          contains:
-            enum:
-              - fsl,imx8qm-audmix
-    then:
-      required:
-        - power-domains
+  - power-domains
 
 unevaluatedProperties: false
 

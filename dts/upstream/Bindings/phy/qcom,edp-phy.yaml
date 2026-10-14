@@ -18,7 +18,6 @@ properties:
   compatible:
     oneOf:
       - enum:
-          - qcom,glymur-dp-phy
           - qcom,sa8775p-edp-phy
           - qcom,sc7280-edp-phy
           - qcom,sc8180x-edp-phy
@@ -38,15 +37,12 @@ properties:
       - description: PLL register block
 
   clocks:
-    minItems: 2
-    maxItems: 3
+    maxItems: 2
 
   clock-names:
-    minItems: 2
     items:
       - const: aux
       - const: cfg_ahb
-      - const: ref
 
   "#clock-cells":
     const: 1
@@ -67,30 +63,6 @@ required:
   - clock-names
   - "#clock-cells"
   - "#phy-cells"
-
-allOf:
-  - if:
-      properties:
-        compatible:
-          enum:
-            - qcom,glymur-dp-phy
-            - qcom,x1e80100-dp-phy
-    then:
-      properties:
-        clocks:
-          minItems: 3
-          maxItems: 3
-        clock-names:
-          minItems: 3
-          maxItems: 3
-    else:
-      properties:
-        clocks:
-          minItems: 2
-          maxItems: 2
-        clock-names:
-          minItems: 2
-          maxItems: 2
 
 additionalProperties: false
 

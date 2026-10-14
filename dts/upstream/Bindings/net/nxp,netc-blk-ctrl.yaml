@@ -21,7 +21,6 @@ maintainers:
 properties:
   compatible:
     enum:
-      - nxp,imx94-netc-blk-ctrl
       - nxp,imx95-netc-blk-ctrl
 
   reg:

@@ -104,7 +104,7 @@ DEBUG_UART_FUNCS
 
 #if CONFIG_IS_ENABLED(DM_SERIAL)
 
-#if CONFIG_IS_ENABLED(OF_REAL) && CONFIG_IS_ENABLED(SERIAL_PRESENT)
+#if CONFIG_IS_ENABLED(OF_REAL)
 static int omap_serial_of_to_plat(struct udevice *dev)
 {
 	struct ns16550_plat *plat = dev_get_plat(dev);

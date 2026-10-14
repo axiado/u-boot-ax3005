@@ -11,6 +11,7 @@
 #include <asm/arch/pinmux.h>
 #include <asm/arch-tegra/ap.h>
 #include <asm/arch-tegra/tegra.h>
+#include <asm/global_data.h>
 #include <asm/gpio.h>
 #include <asm/io.h>
 #include <dm.h>
@@ -21,6 +22,8 @@
 #include "../common/tdx-common.h"
 
 #include "pinmux-config-apalis_t30.h"
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define PMU_I2C_ADDRESS		0x2D
 #define MAX_I2C_RETRY		3

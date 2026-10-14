@@ -163,6 +163,7 @@ examples:
       method          = "smc";
     };
 
+
   - |+
 
     // Case 3: PSCI v0.2 and PSCI v0.1.

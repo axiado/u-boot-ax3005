@@ -8,6 +8,7 @@
 #include <command.h>
 #include <env.h>
 #include <libtizen.h>
+#include <asm/global_data.h>
 #include <linux/delay.h>
 #include <linux/printk.h>
 #include <samsung/misc.h>
@@ -35,6 +36,8 @@
 #endif
 #include <power/pmic.h>
 #include <mmc.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_SET_DFU_ALT_INFO
 void set_dfu_alt_info(char *interface, char *devstr)
@@ -101,7 +104,7 @@ void set_board_info(void)
 	if (!bdtype)
 		bdtype = "";
 
-	snprintf(info, sizeof(info), "%s%s", bdname, bdtype);
+	sprintf(info, "%s%s", bdname, bdtype);
 	env_set("board_name", info);
 #endif
 	snprintf(info, ARRAY_SIZE(info),  "%s%x-%s%s.dtb",

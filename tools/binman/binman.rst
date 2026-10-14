@@ -1369,8 +1369,10 @@ the following is produced::
 Entry Documentation
 ===================
 
-For details on the various entry types supported by binman and how to use
-them, see entries.rst (auto-generated from the source code).
+For details on the various entry types supported by binman and how to use them,
+see entries.rst which is generated from the source code using:
+
+    binman entry-docs >tools/binman/entries.rst
 
 .. toctree::
    :maxdepth: 2
@@ -1636,8 +1638,10 @@ To select a custom directory, use the ``--tooldir`` option.
 Bintool Documentation
 =====================
 
-To provide details on the various bintools supported by binman, bintools.rst
-is auto-generated from the source code.
+To provide details on the various bintools supported by binman, bintools.rst is
+generated from the source code using:
+
+    binman bintool-docs >tools/binman/bintools.rst
 
 .. toctree::
    :maxdepth: 2

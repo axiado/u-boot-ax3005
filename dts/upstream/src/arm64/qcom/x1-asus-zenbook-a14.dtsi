@@ -11,9 +11,10 @@
 #include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
 #include <dt-bindings/regulator/qcom,rpmh-regulator.h>
 
-#include "hamoa-pmics.dtsi"
+#include "x1e80100-pmics.dtsi"
 
 / {
+	model = "ASUS Zenbook A14";
 	chassis-type = "laptop";
 
 	aliases {
@@ -1004,9 +1005,13 @@
 	status = "okay";
 
 	aux-bus {
-		panel: panel {
+		panel {
 			compatible = "edp-panel";
+			enable-gpios = <&pmc8380_3_gpios 4 GPIO_ACTIVE_HIGH>;
 			power-supply = <&vreg_edp_3p3>;
+
+			pinctrl-0 = <&edp_bl_en>;
+			pinctrl-names = "default";
 
 			port {
 				edp_panel_in: endpoint {
@@ -1032,6 +1037,9 @@
 };
 
 &pcie4 {
+	perst-gpios = <&tlmm 146 GPIO_ACTIVE_LOW>;
+	wake-gpios = <&tlmm 148 GPIO_ACTIVE_LOW>;
+
 	pinctrl-0 = <&pcie4_default>;
 	pinctrl-names = "default";
 
@@ -1045,12 +1053,10 @@
 	status = "okay";
 };
 
-&pcie4_port0 {
-	reset-gpios = <&tlmm 146 GPIO_ACTIVE_LOW>;
-	wake-gpios = <&tlmm 148 GPIO_ACTIVE_LOW>;
-};
-
 &pcie6a {
+	perst-gpios = <&tlmm 152 GPIO_ACTIVE_LOW>;
+	wake-gpios = <&tlmm 154 GPIO_ACTIVE_LOW>;
+
 	vddpe-3v3-supply = <&vreg_nvme>;
 
 	pinctrl-0 = <&pcie6a_default>;
@@ -1064,11 +1070,6 @@
 	vdda-pll-supply = <&vreg_l2j_1p2>;
 
 	status = "okay";
-};
-
-&pcie6a_port0 {
-	reset-gpios = <&tlmm 152 GPIO_ACTIVE_LOW>;
-	wake-gpios = <&tlmm 154 GPIO_ACTIVE_LOW>;
 };
 
 &pm8550_gpios {

@@ -9,7 +9,7 @@
 #define MTK_PINCTRL_V0 0x0
 #define MTK_PINCTRL_V1 0x1
 #define BASE_CALC_NONE 0
-#define MAX_BASE_CALC 15
+#define MAX_BASE_CALC 10
 
 #define MTK_RANGE(_a)		{ .range = (_a), .nranges = ARRAY_SIZE(_a), }
 
@@ -67,7 +67,6 @@ enum {
 	PINCTRL_PIN_REG_PUPD,
 	PINCTRL_PIN_REG_R0,
 	PINCTRL_PIN_REG_R1,
-	PINCTRL_PIN_REG_RSEL,
 	PINCTRL_PIN_REG_MAX,
 };
 
@@ -204,7 +203,6 @@ struct mtk_io_type_desc {
 			bool pullup, u32 val);
 	int (*drive_set)(struct udevice *dev, u32 pin, u32 arg);
 	int (*input_enable)(struct udevice *dev, u32 pin, u32 arg);
-	int (*get_pinconf)(struct udevice *dev, u32 pin, char *buf, size_t size);
 #endif
 };
 
@@ -255,8 +253,6 @@ int mtk_pinconf_bias_set_pullen_pullsel(struct udevice *dev, u32 pin,
 					bool disable, bool pullup, u32 val);
 int mtk_pinconf_bias_set_pupd_r1_r0(struct udevice *dev, u32 pin, bool disable,
 				    bool pullup, u32 val);
-int mtk_pinconf_bias_set_pu_pd_rsel(struct udevice *dev, u32 pin, bool disable,
-				    bool pullup, u32 val);
 int mtk_pinconf_bias_set_v0(struct udevice *dev, u32 pin, bool disable,
 			    bool pullup, u32 val);
 int mtk_pinconf_bias_set_v1(struct udevice *dev, u32 pin, bool disable,
@@ -264,9 +260,6 @@ int mtk_pinconf_bias_set_v1(struct udevice *dev, u32 pin, bool disable,
 int mtk_pinconf_input_enable_v1(struct udevice *dev, u32 pin, u32 arg);
 int mtk_pinconf_drive_set_v0(struct udevice *dev, u32 pin, u32 arg);
 int mtk_pinconf_drive_set_v1(struct udevice *dev, u32 pin, u32 arg);
-int mtk_pinconf_get_pu_pd(struct udevice *dev, u32 pin, char *buf, size_t size);
-int mtk_pinconf_get_pupd_r1_r0(struct udevice *dev, u32 pin, char *buf, size_t size);
-int mtk_pinconf_get_pu_pd_rsel(struct udevice *dev, u32 pin, char *buf, size_t size);
 
 #endif
 

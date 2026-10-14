@@ -5,6 +5,7 @@
  * Based on QSDK
  */
 
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/addrspace.h>
 #include <asm/types.h>
@@ -180,6 +181,8 @@
 	DDR_CTL_CONFIG_WMAC_SRAM_SYNC_SET(0x1) | \
 	DDR_CTL_CONFIG_MISC_SRC1_SRAM_SYNC_SET(0x1) | \
 	DDR_CTL_CONFIG_MISC_SRC2_SRAM_SYNC_SET(0x1)
+
+DECLARE_GLOBAL_DATA_PTR;
 
 void qca956x_ddr_init(void)
 {

@@ -120,11 +120,11 @@ properties:
 
   vdd-csiphy-0p8-supply:
     description:
-      0.8V supply to a PHY.
+      Phandle to a 0.8V regulator supply to a PHY.
 
   vdd-csiphy-1p2-supply:
     description:
-      1.2V supply to a PHY.
+      Phandle to 1.8V regulator supply to a PHY.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

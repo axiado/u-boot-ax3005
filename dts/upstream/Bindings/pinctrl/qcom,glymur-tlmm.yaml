@@ -10,16 +10,14 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>
 
 description:
-  Top Level Mode Multiplexer pin controller in Qualcomm Glymur and Mahua SoC.
+  Top Level Mode Multiplexer pin controller in Qualcomm Glymur SoC.
 
 allOf:
   - $ref: /schemas/pinctrl/qcom,tlmm-common.yaml#
 
 properties:
   compatible:
-    enum:
-      - qcom,glymur-tlmm
-      - qcom,mahua-tlmm
+    const: qcom,glymur-tlmm
 
   reg:
     maxItems: 1

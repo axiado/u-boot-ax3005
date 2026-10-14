@@ -21,6 +21,10 @@
 
 #include <ata.h>
 
+#ifdef CONFIG_LED_STATUS
+# include <status_led.h>
+#endif
+
 /* Current I/O Device	*/
 static int curr_device;
 

@@ -590,11 +590,10 @@
 		    <&gbe_pmx_obsclk>;
 	assigned-clocks = <&k3_clks 157 70>, <&k3_clks 157 20>;
 	assigned-clock-parents = <&k3_clks 157 72>, <&k3_clks 157 22>;
-	status = "okay";
 };
 
 &cpsw_port1 {
-	phy-mode = "rgmii-id";
+	phy-mode = "rgmii-rxid";
 	phy-handle = <&cpsw3g_phy0>;
 };
 

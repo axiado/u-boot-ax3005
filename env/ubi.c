@@ -33,6 +33,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define ENV_UBI_VOLUME_REDUND "invalid"
 #endif
 
+#ifdef CONFIG_CMD_SAVEENV
 #ifdef CONFIG_ENV_REDUNDANT
 static int env_ubi_save(void)
 {
@@ -102,6 +103,7 @@ static int env_ubi_save(void)
 	return 0;
 }
 #endif /* CONFIG_ENV_REDUNDANT */
+#endif /* CONFIG_CMD_SAVEENV */
 
 #ifdef CONFIG_ENV_REDUNDANT
 static int env_ubi_load(void)
@@ -217,6 +219,6 @@ U_BOOT_ENV_LOCATION(ubi) = {
 	.location	= ENVL_UBI,
 	ENV_NAME("UBI")
 	.load		= env_ubi_load,
-	.save		= ENV_SAVE_PTR(env_ubi_save),
+	.save		= env_save_ptr(env_ubi_save),
 	.erase		= ENV_ERASE_PTR(env_ubi_erase),
 };

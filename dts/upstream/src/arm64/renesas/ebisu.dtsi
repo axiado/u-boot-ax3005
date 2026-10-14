@@ -765,7 +765,7 @@
 				reg = <0x00040000 0x140000>;
 				read-only;
 			};
-			cert-header-sa6@180000 {
+			cert_header_sa6@180000 {
 				reg = <0x00180000 0x040000>;
 				read-only;
 			};
@@ -856,11 +856,6 @@
 
 &ssi1 {
 	shared-pin;
-};
-
-/* Firmware should reserve it but sadly doesn't */
-&swdt {
-	status = "reserved";
 };
 
 &usb2_phy0 {

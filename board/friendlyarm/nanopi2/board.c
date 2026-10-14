@@ -328,7 +328,6 @@ static void bd_update_env(void)
 #define CMDLINE_LCD		" lcd="
 	char cmdline[CONFIG_SYS_CBSIZE];
 	int n = 1;
-	int ret;
 
 	if (rootdev != CONFIG_ROOT_DEV && !env_get("firstboot")) {
 		env_set_ulong("rootdev", rootdev);
@@ -348,63 +347,49 @@ static void bd_update_env(void)
 	else
 		cmdline[0] = '\0';
 
+	if ((n + strlen(name) + sizeof(CMDLINE_LCD)) > sizeof(cmdline)) {
+		printf("Error: `bootargs' is too large (%d)\n", n);
+		goto __exit;
+	}
+
 	if (bootargs) {
 		p = strstr(bootargs, CMDLINE_LCD);
 		if (p) {
 			n = (p - bootargs);
 			p += strlen(CMDLINE_LCD);
 		}
-		ret = snprintf(cmdline, sizeof(cmdline), "%.*s", n, bootargs);
-		if (ret < 0 || ret >= (int)sizeof(cmdline))
-			goto __exit;
+		strncpy(cmdline, bootargs, n);
 	}
 
 	/* add `lcd=NAME,NUMdpi' */
-	ret = snprintf(cmdline + n, sizeof(cmdline) - n, "%s", CMDLINE_LCD);
-	if (ret < 0 || ret >= (int)(sizeof(cmdline) - n))
-		goto __exit;
-	n += ret;
+	strncpy(cmdline + n, CMDLINE_LCD, strlen(CMDLINE_LCD));
+	n += strlen(CMDLINE_LCD);
 
-	ret = snprintf(cmdline + n, sizeof(cmdline) - n, "%s", name);
-	if (ret < 0 || ret >= (int)(sizeof(cmdline) - n))
-		goto __exit;
-	n += ret;
+	strcpy(cmdline + n, name);
+	n += strlen(name);
 
 	if (lcddpi) {
-		ret = snprintf(cmdline + n, sizeof(cmdline) - n, ",%sdpi", lcddpi);
-		if (ret < 0 || ret >= (int)(sizeof(cmdline) - n))
-			goto __exit;
-		n += ret;
+		n += sprintf(cmdline + n, ",%sdpi", lcddpi);
 	} else {
 		int dpi = bd_get_lcd_density();
 
-		if (dpi > 0 && dpi < 600) {
-			ret = snprintf(cmdline + n, sizeof(cmdline) - n, ",%ddpi", dpi);
-			if (ret < 0 || ret >= (int)(sizeof(cmdline) - n))
-				goto __exit;
-			n += ret;
-		}
+		if (dpi > 0 && dpi < 600)
+			n += sprintf(cmdline + n, ",%ddpi", dpi);
 	}
 
 	/* copy remaining of bootargs */
 	if (p) {
 		p = strstr(p, " ");
 		if (p) {
-			ret = snprintf(cmdline + n, sizeof(cmdline) - n, "%s", p);
-			if (ret < 0 || ret >= (int)(sizeof(cmdline) - n))
-				goto __exit;
-			n += ret;
+			strcpy(cmdline + n, p);
+			n += strlen(p);
 		}
 	}
 
 	/* append `bootdev=2' */
 #define CMDLINE_BDEV	" bootdev="
-	if (rootdev > 0 && !strstr(cmdline, CMDLINE_BDEV)) {
-		ret = snprintf(cmdline + n, sizeof(cmdline) - n, "%s2", CMDLINE_BDEV);
-		if (ret < 0 || ret >= (int)(sizeof(cmdline) - n))
-			goto __exit;
-		n += ret;
-	}
+	if (rootdev > 0 && !strstr(cmdline, CMDLINE_BDEV))
+		n += sprintf(cmdline + n, "%s2", CMDLINE_BDEV);
 
 	/* finally, let's update uboot env & save it */
 	if (bootargs && strncmp(cmdline, bootargs, sizeof(cmdline))) {

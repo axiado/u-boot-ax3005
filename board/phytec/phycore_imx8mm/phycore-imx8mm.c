@@ -5,10 +5,13 @@
  */
 
 #include <asm/arch/sys_proto.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <env.h>
 #include <miiphy.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static int setup_fec(void)
 {

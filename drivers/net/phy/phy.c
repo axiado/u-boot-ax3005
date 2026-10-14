@@ -17,6 +17,7 @@
 #include <miiphy.h>
 #include <phy.h>
 #include <errno.h>
+#include <asm/global_data.h>
 #include <asm-generic/gpio.h>
 #include <dm/device_compat.h>
 #include <dm/of_extra.h>
@@ -24,6 +25,8 @@
 #include <linux/delay.h>
 #include <linux/err.h>
 #include <linux/compiler.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /* Generic PHY support and helper functions */
 

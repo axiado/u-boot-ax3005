@@ -10,6 +10,7 @@
 #include <panel.h>
 #include <regmap.h>
 #include <syscon.h>
+#include <asm/global_data.h>
 #include <asm/gpio.h>
 #include <asm/arch-rockchip/clock.h>
 #include <asm/arch-rockchip/grf_rk3288.h>
@@ -17,6 +18,8 @@
 #include <asm/arch-rockchip/lvds_rk3288.h>
 #include <dt-bindings/clock/rk3288-cru.h>
 #include <dt-bindings/video/rk3288.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /**
  * struct rk_lvds_priv - private rockchip lvds display driver info

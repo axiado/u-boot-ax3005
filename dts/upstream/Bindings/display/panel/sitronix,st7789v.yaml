@@ -34,9 +34,8 @@ properties:
   spi-cpol: true
 
   spi-rx-bus-width:
-    items:
-      minimum: 0
-      maximum: 1
+    minimum: 0
+    maximum: 1
 
   dc-gpios:
     maxItems: 1

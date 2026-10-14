@@ -10,6 +10,7 @@
 #include <init.h>
 #include <env.h>
 #include <asm/cache.h>
+#include <asm/global_data.h>
 #include <linux/arm-smccc.h>
 #include <linux/psci.h>
 #include <dm.h>
@@ -22,6 +23,8 @@
 
 /* Strength (sdc1) */
 #define SDC1_HDRV_PULL_CTL_REG          (TLMM_BASE_ADDR + 0x0012D000)
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static void sdhci_power_init(void)
 {

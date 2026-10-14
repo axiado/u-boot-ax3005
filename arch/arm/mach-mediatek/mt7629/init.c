@@ -27,7 +27,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-static int mtk_pll_early_init(void)
+int mtk_pll_early_init(void)
 {
 	unsigned long pll_rates[] = {
 		[CLK_APMIXED_ARMPLL] = 1250000000,

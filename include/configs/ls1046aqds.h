@@ -312,11 +312,6 @@
 /*
  * Environment
  */
-#ifndef SPL_NO_MISC
-/* Initial environment variables */
-#define CFG_EXTRA_ENV_SETTINGS      \
-	EXTRA_ENV_SETTINGS
-#endif
 
 #ifdef CONFIG_TFABOOT
 #define IFC_NAND_BOOTCOMMAND "run distro_bootcmd; run nand_bootcmd; "	\

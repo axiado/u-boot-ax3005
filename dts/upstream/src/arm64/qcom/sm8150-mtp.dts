@@ -358,10 +358,6 @@
 	status = "okay";
 };
 
-&gpu_zap_shader {
-	firmware-name = "qcom/sm8150/a640_zap.mbn";
-};
-
 &pon {
 	mode-bootloader = <0x2>;
 	mode-recovery = <0x1>;

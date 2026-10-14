@@ -19,9 +19,6 @@
  */
 int cleanup_before_linux(void)
 {
-	if (!CONFIG_IS_ENABLED(LIB_BOOTM) && !CONFIG_IS_ENABLED(LIB_BOOTZ))
-		return 0;
-
 	/*
 	 * this function is called just before we call linux
 	 * it prepares the processor for linux
@@ -48,9 +45,8 @@ int cleanup_before_linux(void)
 }
 
 /*
- * Perform the low-level reset. ARMv7M only.
+ * Perform the low-level reset.
  */
-#if IS_ENABLED(CONFIG_CPU_V7M)
 void reset_cpu(void)
 {
 	/*
@@ -60,10 +56,8 @@ void reset_cpu(void)
 		| (V7M_SCB->aircr & V7M_AIRCR_PRIGROUP_MSK)
 		| V7M_AIRCR_SYSRESET, &V7M_SCB->aircr);
 }
-#endif
 
 void spl_perform_arch_fixups(struct spl_image_info *spl_image)
 {
-	if (IS_ENABLED(CONFIG_XPL_BUILD))
-		spl_image->entry_point |= 0x1;
+	spl_image->entry_point |= 0x1;
 }

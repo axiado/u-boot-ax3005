@@ -39,7 +39,6 @@ config SIFIVE_FU540
 	imply PWM_SIFIVE
 	imply DM_I2C
 	imply SYS_I2C_OCORES
-	imply OF_UPSTREAM
 
 if ENV_IS_IN_SPI_FLASH
 

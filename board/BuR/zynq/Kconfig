@@ -7,6 +7,7 @@ config TARGET_ZYNQ_BR
 	bool "Support BR Zynq builds"
 	depends on SYS_VENDOR = "BuR"
 	select BINMAN
+	select SPL_BINMAN_FDT
 
 endif
 

@@ -15,6 +15,8 @@
 #include <linux/err.h>
 #include <relocate.h>
 
+DECLARE_GLOBAL_DATA_PTR;
+
 int cpu_probe_all(void)
 {
 	int ret = uclass_probe_all(UCLASS_CPU);

@@ -7,7 +7,10 @@
 
 #include <console.h>
 #include <mapmem.h>
+#include <asm/global_data.h>
 #include <test/ut.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /* Declare a new exit test */
 #define EXIT_TEST(_name, _flags)	UNIT_TEST(_name, _flags, exit)

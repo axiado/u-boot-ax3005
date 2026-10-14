@@ -54,7 +54,12 @@ static void boot_jump_linux(struct bootm_headers *images)
 
 	bootstage_mark(BOOTSTAGE_ID_RUN_OS);
 
-	bootm_final(0);
+#ifdef CONFIG_BOOTSTAGE_FDT
+	bootstage_fdt_add_report();
+#endif
+#ifdef CONFIG_BOOTSTAGE_REPORT
+	bootstage_report();
+#endif
 
 #if defined(CONFIG_SYS_INIT_RAM_LOCK) && !defined(CONFIG_E500)
 	unlock_ram_in_cache();

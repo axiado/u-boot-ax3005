@@ -50,7 +50,6 @@ struct env_opts default_opts = {
 };
 
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define ROUND_UP(x, y)		(DIV_ROUND_UP(x, y) * (y))
 
 #define min(x, y) ({				\
 	typeof(x) _min1 = (x);			\
@@ -984,6 +983,9 @@ static int flash_write_buf(int dev, int fd, void *buf, size_t count)
 {
 	void *data;
 	struct erase_info_user erase;
+	size_t blocklen;	/* length of NAND block / NOR erase sector */
+	size_t erase_len;	/* whole area that can be erased - may include
+				   bad blocks */
 	size_t erasesize;	/* erase / write length - one block on NAND,
 				   whole area on NOR */
 	size_t processed = 0;	/* progress counter */
@@ -1002,21 +1004,20 @@ static int flash_write_buf(int dev, int fd, void *buf, size_t count)
 	 * For mtd devices only offset and size of the environment do matter
 	 */
 	if (DEVTYPE(dev) == MTD_ABSENT) {
-		erasesize = count;
+		blocklen = count;
+		erase_len = blocklen;
+		blockstart = DEVOFFSET(dev);
 		block_seek = 0;
-		write_total = count;
+		write_total = blocklen;
 	} else {
+		blocklen = DEVESIZE(dev);
+
 		erase_offset = DEVOFFSET(dev);
 
-		if (DEVTYPE(dev) == MTD_NANDFLASH) {
-			/*
-			 * NAND: calculate which blocks we are writing. We have
-			 * to write one block at a time to skip bad blocks.
-			 */
-			erasesize = DEVESIZE(dev);
-		} else {
-			erasesize = environment_end(dev) - erase_offset;
-		}
+		/* Maximum area we may use */
+		erase_len = environment_end(dev) - erase_offset;
+
+		blockstart = erase_offset;
 
 		/* Offset inside a block */
 		block_seek = DEVOFFSET(dev) - erase_offset;
@@ -1026,7 +1027,8 @@ static int flash_write_buf(int dev, int fd, void *buf, size_t count)
 		 * to the start of the data, then count bytes of data, and
 		 * to the end of the block
 		 */
-		write_total = ROUND_UP(block_seek + count, DEVESIZE(dev));
+		write_total = ((block_seek + count + blocklen - 1) /
+			       blocklen) * blocklen;
 	}
 
 	/*
@@ -1035,11 +1037,11 @@ static int flash_write_buf(int dev, int fd, void *buf, size_t count)
 	 * block back again.
 	 */
 	if (write_total > count) {
-		data = malloc(write_total);
+		data = malloc(erase_len);
 		if (!data) {
 			fprintf(stderr,
 				"Cannot malloc %zu bytes: %s\n",
-				write_total, strerror(errno));
+				erase_len, strerror(errno));
 			return -1;
 		}
 
@@ -1065,15 +1067,24 @@ static int flash_write_buf(int dev, int fd, void *buf, size_t count)
 	} else {
 		/*
 		 * We get here, iff offset is block-aligned and count is a
-		 * multiple of erase size - see write_total calculation above
+		 * multiple of blocklen - see write_total calculation above
 		 */
 		data = buf;
+	}
+
+	if (DEVTYPE(dev) == MTD_NANDFLASH) {
+		/*
+		 * NAND: calculate which blocks we are writing. We have
+		 * to write one block at a time to skip bad blocks.
+		 */
+		erasesize = blocklen;
+	} else {
+		erasesize = erase_len;
 	}
 
 	erase.length = erasesize;
 
 	/* This only runs once on NOR flash and SPI-dataflash */
-	blockstart = DEVOFFSET(dev);
 	while (processed < write_total) {
 		rc = flash_bad_block(fd, DEVTYPE(dev), blockstart);
 		if (rc < 0)	/* block test failed */
@@ -1085,7 +1096,7 @@ static int flash_write_buf(int dev, int fd, void *buf, size_t count)
 		}
 
 		if (rc) {	/* block is bad */
-			blockstart += erasesize;
+			blockstart += blocklen;
 			continue;
 		}
 

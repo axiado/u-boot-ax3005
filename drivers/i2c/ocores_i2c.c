@@ -12,6 +12,7 @@
  * Andreas Larsson <andreas@gaisler.com>
  */
 
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <clk.h>
 #include <dm.h>
@@ -73,6 +74,8 @@ struct ocores_i2c_bus {
 	void (*setreg)(struct ocores_i2c_bus *i2c, int reg, u8 value);
 	u8 (*getreg)(struct ocores_i2c_bus *i2c, int reg);
 };
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /* Boolean attribute values */
 enum {

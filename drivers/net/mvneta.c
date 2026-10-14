@@ -20,6 +20,7 @@
 #include <config.h>
 #include <malloc.h>
 #include <asm/cache.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <dm/device_compat.h>
 #include <dm/devres.h>
@@ -35,6 +36,8 @@
 #include <linux/compat.h>
 #include <linux/mbus.h>
 #include <asm-generic/gpio.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define MVNETA_NR_CPUS		1
 #define ETH_HLEN		14	/* Total octets in header */

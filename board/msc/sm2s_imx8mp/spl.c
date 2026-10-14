@@ -17,6 +17,7 @@
 #include <log.h>
 #include <mmc.h>
 #include <spl.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/ddr.h>
@@ -31,6 +32,8 @@
 #include <linux/delay.h>
 #include <power/pmic.h>
 #include <power/rn5t567_pmic.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {

@@ -65,6 +65,7 @@ properties:
           - const: vbus_v
           - const: usb_charger_c
 
+
 required:
   - compatible
   - monitored-battery

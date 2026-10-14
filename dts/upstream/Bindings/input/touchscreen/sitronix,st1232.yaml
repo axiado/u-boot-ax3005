@@ -14,13 +14,9 @@ allOf:
 
 properties:
   compatible:
-    oneOf:
-      - enum:
-          - sitronix,st1232
-          - sitronix,st1633
-      - items:
-          - const: sitronix,st1624
-          - const: sitronix,st1633
+    enum:
+      - sitronix,st1232
+      - sitronix,st1633
 
   reg:
     maxItems: 1

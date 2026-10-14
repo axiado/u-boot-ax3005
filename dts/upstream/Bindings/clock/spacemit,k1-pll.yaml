@@ -4,16 +4,14 @@
 $id: http://devicetree.org/schemas/clock/spacemit,k1-pll.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: SpacemiT K1/K3 PLL
+title: SpacemiT K1 PLL
 
 maintainers:
   - Haylen Chu <heylenay@4d2.org>
 
 properties:
   compatible:
-    enum:
-      - spacemit,k1-pll
-      - spacemit,k3-pll
+    const: spacemit,k1-pll
 
   reg:
     maxItems: 1
@@ -30,8 +28,7 @@ properties:
   "#clock-cells":
     const: 1
     description:
-      For K1 SoC, check <dt-bindings/clock/spacemit,k1-syscon.h> for valid indices.
-      For K3 SoC, check <dt-bindings/clock/spacemit,k3-clocks.h> for valid indices.
+      See <dt-bindings/clock/spacemit,k1-syscon.h> for valid indices.
 
 required:
   - compatible

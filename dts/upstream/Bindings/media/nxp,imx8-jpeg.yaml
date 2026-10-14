@@ -55,12 +55,6 @@ properties:
     minItems: 1               # Wrapper and all slots
     maxItems: 5               # Wrapper and 4 slots
 
-  sram:
-    $ref: /schemas/types.yaml#/definitions/phandle
-    description:
-      Optional phandle to a reserved on-chip SRAM regions. The SRAM can
-      be used for descriptor storage, which may improve bus utilization.
-
 required:
   - compatible
   - reg
@@ -84,6 +78,7 @@ allOf:
       properties:
         power-domains:
           minItems: 2        # Wrapper and 1 slot
+
 
 additionalProperties: false
 

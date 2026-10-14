@@ -16,6 +16,7 @@ properties:
   compatible:
     const: starfive,jh7110-pcie
 
+
   reg:
     maxItems: 2
 

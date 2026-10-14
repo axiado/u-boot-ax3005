@@ -25,7 +25,6 @@ properties:
           - fsl,imx53-asrc
           - fsl,imx8qm-asrc
           - fsl,imx8qxp-asrc
-          - fsl,imx952-asrc
       - items:
           - enum:
               - fsl,imx6sx-asrc

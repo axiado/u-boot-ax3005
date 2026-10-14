@@ -5,6 +5,7 @@
  */
 
 #include <log.h>
+#include <asm/global_data.h>
 #include <dm/device_compat.h>
 #include <dm/devres.h>
 #include <linux/io.h>
@@ -13,6 +14,8 @@
 #include <dm/pinctrl.h>
 #include <dm/read.h>
 #include "pinctrl-mxs.h"
+
+DECLARE_GLOBAL_DATA_PTR;
 
 struct mxs_pinctrl_priv {
 	void __iomem *base;

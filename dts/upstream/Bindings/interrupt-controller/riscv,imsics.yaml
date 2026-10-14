@@ -48,7 +48,6 @@ properties:
     items:
       - enum:
           - qemu,imsics
-          - spacemit,k3-imsics
       - const: riscv,imsics
 
   reg:

@@ -49,10 +49,6 @@ properties:
     items:
       - const: mclk
 
-  interrupts:
-    maxItems: 1
-    description: Headphone detect interrupt
-
   port:
     $ref: audio-graph-port.yaml#
     unevaluatedProperties: false

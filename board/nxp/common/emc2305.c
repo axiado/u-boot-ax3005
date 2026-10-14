@@ -4,12 +4,14 @@
  *
  */
 
-#include <config.h>
 #include <command.h>
 #include <i2c.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 
 #include "emc2305.h"
+
+DECLARE_GLOBAL_DATA_PTR;
 
 void set_fan_speed(u8 data, int chip_addr)
 {

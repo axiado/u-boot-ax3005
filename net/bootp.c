@@ -19,8 +19,8 @@
 #include <linux/delay.h>
 #include <net/tftp.h>
 #include "bootp.h"
-#if IS_ENABLED(CONFIG_LED_BOOT)
-#include <led.h>
+#ifdef CONFIG_LED_STATUS
+#include <status_led.h>
 #endif
 #ifdef CONFIG_BOOTP_RANDOM_DELAY
 #include "net_rand.h"
@@ -87,6 +87,23 @@ static u8 dhcp_option_overload;
 #define OVERLOAD_SNAME 2
 static void dhcp_handler(uchar *pkt, unsigned dest, struct in_addr sip,
 			unsigned src, unsigned len);
+
+/* For Debug */
+#if 0
+static char *dhcpmsg2str(int type)
+{
+	switch (type) {
+	case 1:	 return "DHCPDISCOVER"; break;
+	case 2:	 return "DHCPOFFER";	break;
+	case 3:	 return "DHCPREQUEST";	break;
+	case 4:	 return "DHCPDECLINE";	break;
+	case 5:	 return "DHCPACK";	break;
+	case 6:	 return "DHCPNACK";	break;
+	case 7:	 return "DHCPRELEASE";	break;
+	default: return "UNKNOWN/INVALID MSG TYPE"; break;
+	}
+}
+#endif
 #endif
 
 static void bootp_add_id(ulong id)
@@ -379,8 +396,8 @@ static void bootp_handler(uchar *pkt, unsigned dest, struct in_addr sip,
 	/*
 	 *	Got a good BOOTP reply.	 Copy the data into our variables.
 	 */
-#if IS_ENABLED(CONFIG_LED_BOOT)
-	led_boot_off();
+#if defined(CONFIG_LED_STATUS) && defined(CONFIG_LED_STATUS_BOOT_ENABLE)
+	status_led_set(CONFIG_LED_STATUS_BOOT, CONFIG_LED_STATUS_OFF);
 #endif
 
 	store_net_params(bp);		/* Store net parameters from reply */

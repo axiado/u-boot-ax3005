@@ -19,6 +19,8 @@
 #include <usb/tcpm.h>
 #include "tcpm-internal.h"
 
+DECLARE_GLOBAL_DATA_PTR;
+
 const char * const tcpm_states[] = {
 	FOREACH_TCPM_STATE(GENERATE_TCPM_STRING)
 };

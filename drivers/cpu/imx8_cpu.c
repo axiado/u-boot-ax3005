@@ -6,6 +6,7 @@
 #include <cpu.h>
 #include <dm.h>
 #include <thermal.h>
+#include <asm/global_data.h>
 #include <asm/ptrace.h>
 #include <asm/system.h>
 #include <firmware/imx/sci/sci.h>
@@ -16,6 +17,8 @@
 #include <linux/bitops.h>
 #include <linux/clk-provider.h>
 #include <linux/psci.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define IMX_REV_LEN	4
 struct cpu_imx_plat {
@@ -112,8 +115,6 @@ static const char *get_imx_type_str(u32 imxtype)
 		return "95";
 	case MXC_CPU_IMX94:
 		return "94";
-	case MXC_CPU_IMX952:
-		return "952";
 	default:
 		return "??";
 	}

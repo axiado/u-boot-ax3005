@@ -10,6 +10,7 @@
 #include <log.h>
 #include <panel.h>
 #include <regmap.h>
+#include <asm/global_data.h>
 #include "rk_mipi.h"
 #include <syscon.h>
 #include <asm/gpio.h>
@@ -20,6 +21,8 @@
 #include <asm/arch-rockchip/cru.h>
 #include <asm/arch-rockchip/grf_rk3399.h>
 #include <asm/arch-rockchip/rockchip_mipi_dsi.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 int rk_mipi_read_timing(struct udevice *dev,
 			struct display_timing *timing)

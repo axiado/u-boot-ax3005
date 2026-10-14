@@ -27,7 +27,6 @@ properties:
 required:
   - compatible
   - reg
-  - clocks
   - '#pwm-cells'
 
 allOf:
@@ -37,12 +36,9 @@ unevaluatedProperties: false
 
 examples:
   - |
-    #include <dt-bindings/clock/lpc32xx-clock.h>
-
     pwm@4005c000 {
         compatible = "nxp,lpc3220-pwm";
         reg = <0x4005c000 0x4>;
-        clocks = <&clk LPC32XX_CLK_PWM1>;
         #pwm-cells = <3>;
     };
 

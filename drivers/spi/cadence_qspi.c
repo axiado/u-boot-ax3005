@@ -13,7 +13,6 @@
 #include <spi.h>
 #include <spi-mem.h>
 #include <dm/device_compat.h>
-#include <linux/delay.h>
 #include <linux/err.h>
 #include <linux/errno.h>
 #include <linux/io.h>
@@ -255,23 +254,8 @@ static int cadence_spi_probe(struct udevice *bus)
 	}
 
 	priv->resets = devm_reset_bulk_get_optional(bus);
-	if (priv->resets) {
-		/* Assert all OSPI reset lines */
-		ret = reset_assert_bulk(priv->resets);
-		if (ret) {
-			dev_err(bus, "Failed to assert OSPI reset: %d\n", ret);
-			return ret;
-		}
-
-		udelay(10);
-
-		/* Deassert all OSPI reset lines */
-		ret = reset_deassert_bulk(priv->resets);
-		if (ret) {
-			dev_err(bus, "Failed to deassert OSPI reset: %d\n", ret);
-			return ret;
-		}
-	}
+	if (priv->resets)
+		reset_deassert_bulk(priv->resets);
 
 	if (!priv->qspi_is_init) {
 		cadence_qspi_apb_controller_init(priv);

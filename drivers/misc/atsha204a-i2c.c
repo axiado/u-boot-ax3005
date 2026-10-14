@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <atsha204a-i2c.h>
 #include <log.h>
+#include <asm/global_data.h>
 #include <linux/delay.h>
 #include <linux/bitrev.h>
 #include <u-boot/crc.h>
@@ -23,6 +24,8 @@
 #define ATSHA204A_TRANSACTION_TIMEOUT	100000
 #define ATSHA204A_TRANSACTION_RETRY	5
 #define ATSHA204A_EXECTIME		5000
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static inline u16 atsha204a_crc16(const u8 *buffer, size_t len)
 {

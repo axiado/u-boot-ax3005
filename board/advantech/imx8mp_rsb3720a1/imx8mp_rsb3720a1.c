@@ -26,6 +26,8 @@
 #include <linux/kernel.h>
 #include <power/pmic.h>
 
+DECLARE_GLOBAL_DATA_PTR;
+
 #ifdef CONFIG_NAND_MXS
 static void setup_gpmi_nand(void)
 {

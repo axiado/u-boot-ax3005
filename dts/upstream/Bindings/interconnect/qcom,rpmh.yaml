@@ -122,6 +122,7 @@ allOf:
       required:
         - reg
 
+
 unevaluatedProperties: false
 
 examples:

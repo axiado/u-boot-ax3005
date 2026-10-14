@@ -27,6 +27,8 @@
 
 #include "../common/common.h"
 
+DECLARE_GLOBAL_DATA_PTR;
+
 int data_modul_imx_edm_sbc_board_power_init(void)
 {
 	struct udevice *dev;

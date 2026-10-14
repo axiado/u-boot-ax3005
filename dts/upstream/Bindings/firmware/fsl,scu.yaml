@@ -76,8 +76,7 @@ properties:
           - description: TX0 MU channel
           - description: RX0 MU channel
           - description: optional MU channel for general interrupt
-      - deprecated: true
-        items:
+      - items:
           - description: TX0 MU channel
           - description: TX1 MU channel
           - description: TX2 MU channel
@@ -86,8 +85,7 @@ properties:
           - description: RX1 MU channel
           - description: RX2 MU channel
           - description: RX3 MU channel
-      - deprecated: true
-        items:
+      - items:
           - description: TX0 MU channel
           - description: TX1 MU channel
           - description: TX2 MU channel
@@ -107,8 +105,7 @@ properties:
           - const: tx0
           - const: rx0
           - const: gip3
-      - deprecated: true
-        items:
+      - items:
           - const: tx0
           - const: tx1
           - const: tx2
@@ -117,8 +114,7 @@ properties:
           - const: rx1
           - const: rx2
           - const: rx3
-      - deprecated: true
-        items:
+      - items:
           - const: tx0
           - const: tx1
           - const: tx2
@@ -171,9 +167,11 @@ examples:
     firmware {
         system-controller {
             compatible = "fsl,imx-scu";
-            mbox-names = "tx0", "rx0", "gip3";
-            mboxes = <&lsio_mu1 0 0
-                      &lsio_mu1 1 0
+            mbox-names = "tx0", "tx1", "tx2", "tx3",
+                         "rx0", "rx1", "rx2", "rx3",
+                         "gip3";
+            mboxes = <&lsio_mu1 0 0 &lsio_mu1 0 1 &lsio_mu1 0 2 &lsio_mu1 0 3
+                      &lsio_mu1 1 0 &lsio_mu1 1 1 &lsio_mu1 1 2 &lsio_mu1 1 3
                       &lsio_mu1 3 3>;
 
             clock-controller {

@@ -7,6 +7,7 @@
 #include <dm.h>
 #include <malloc.h>
 #include <power-domain-uclass.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/mach-imx/sys_proto.h>
 #include <dm/device-internal.h>
@@ -20,6 +21,8 @@
 #include <dt-bindings/power/imx8mn-power.h>
 #include <dt-bindings/power/imx8mp-power.h>
 #include <dt-bindings/power/imx8mq-power.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define GPC_PGC_CPU_MAPPING			0x0ec
 #define IMX8MP_GPC_PGC_CPU_MAPPING		0x1cc

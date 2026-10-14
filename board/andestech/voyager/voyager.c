@@ -5,6 +5,7 @@
  */
 
 #include <asm/csr.h>
+#include <asm/global_data.h>
 #include <asm/sbi.h>
 #include <config.h>
 #include <cpu_func.h>
@@ -17,6 +18,8 @@
 #include <linux/io.h>
 #include <net.h>
 #include <spl.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 int dram_init(void)
 {

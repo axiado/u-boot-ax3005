@@ -9,7 +9,3 @@
 };
 
 #include "en7523-u-boot.dtsi"
-
-&gdm1 {
-	status = "okay";
-};

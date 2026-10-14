@@ -46,8 +46,6 @@ void pinmux_init(void)
 #if IS_ENABLED(CONFIG_OF_LIBFDT) && IS_ENABLED(CONFIG_OF_BOARD_SETUP)
 int ft_board_setup(void *fdt, struct bd_info *bd)
 {
-	star_fix_panel(fdt);
-
-	return 0;
+	return star_fix_panel(fdt);
 }
 #endif

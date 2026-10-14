@@ -14,6 +14,7 @@
 #include <asm/cpu.h>
 #include <asm/cpu_common.h>
 #include <asm/cpu_x86.h>
+#include <asm/global_data.h>
 #include <asm/msr.h>
 #include <asm/msr-index.h>
 #include <asm/mtrr.h>
@@ -21,6 +22,8 @@
 #include <asm/speedstep.h>
 #include <asm/turbo.h>
 #include <asm/arch/model_206ax.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static void enable_vmx(void)
 {

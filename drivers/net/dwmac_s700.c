@@ -5,6 +5,7 @@
  * Actions DWMAC specific glue layer
  */
 
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <dm.h>
 #include <clk.h>
@@ -22,6 +23,8 @@
 #define RMII_TXEN_TXER_MFP_CTL0		(0x0 << 13)
 #define RMII_REF_CLK_MFP_CTL0		(0x0 << 6)
 #define CLKO_25M_EN_MFP_CTL3		BIT(30)
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static void dwmac_board_setup(void)
 {

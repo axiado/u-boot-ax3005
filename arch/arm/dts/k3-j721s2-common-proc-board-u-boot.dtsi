@@ -107,6 +107,10 @@
 	};
 };
 
+&ospi1 {
+	status = "disabled";
+};
+
 &usbss0 {
 	bootph-all;
 };

@@ -714,24 +714,6 @@ int fdtdec_get_int_array(const void *blob, int node, const char *prop_name,
 	return err;
 }
 
-int fdtdec_get_long_array(const void *blob, int node, const char *prop_name,
-			 u64 *array, int count)
-{
-	const u64 *cell;
-	int err = 0;
-
-	debug("%s: %s\n", __func__, prop_name);
-	cell = get_prop_check_min_len(blob, node, prop_name,
-				      sizeof(u64) * count, &err);
-	if (!err) {
-		int i;
-
-		for (i = 0; i < count; i++)
-			array[i] = fdt64_to_cpu(cell[i]);
-	}
-	return err;
-}
-
 int fdtdec_get_int_array_count(const void *blob, int node,
 			       const char *prop_name, u32 *array, int count)
 {
@@ -1095,23 +1077,19 @@ int fdtdec_setup_mem_size_base(void)
 
 	gd->ram_size = (phys_size_t)(res.end - res.start + 1);
 	gd->ram_base = (unsigned long)res.start;
-	debug("%s: Initial DRAM size %pap\n", __func__, &gd->ram_size);
+	debug("%s: Initial DRAM size %llx\n", __func__,
+	      (unsigned long long)gd->ram_size);
 
 	return 0;
 }
 
-static ofnode get_next_memory_node(ofnode mem)
+ofnode get_next_memory_node(ofnode mem)
 {
 	do {
 		mem = ofnode_by_prop_value(mem, "device_type", "memory", 7);
 	} while (!ofnode_is_enabled(mem));
 
 	return mem;
-}
-
-ofnode fdtdec_get_next_memory_node(ofnode mem)
-{
-	return get_next_memory_node(mem);
 }
 
 int fdtdec_setup_memory_banksize(void)
@@ -1146,10 +1124,10 @@ int fdtdec_setup_memory_banksize(void)
 		gd->bd->bi_dram[bank].size =
 			(phys_size_t)(res.end - res.start + 1);
 
-		debug("%s: DRAM Bank #%d: start = %pap, size = %pap\n",
+		debug("%s: DRAM Bank #%d: start = 0x%llx, size = 0x%llx\n",
 		      __func__, bank,
-		      &gd->bd->bi_dram[bank].start,
-		      &gd->bd->bi_dram[bank].size);
+		      (unsigned long long)gd->bd->bi_dram[bank].start,
+		      (unsigned long long)gd->bd->bi_dram[bank].size);
 	}
 
 	return 0;

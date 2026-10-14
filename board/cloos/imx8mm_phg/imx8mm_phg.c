@@ -7,10 +7,13 @@
 #include <init.h>
 #include <miiphy.h>
 #include <netdev.h>
+#include <asm/global_data.h>
 
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/io.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 static int setup_fec(void)
 {

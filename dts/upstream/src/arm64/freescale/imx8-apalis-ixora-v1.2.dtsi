@@ -245,10 +245,7 @@
 	status = "okay";
 };
 
-/* Apalis BKL1_PWM */
-&pwm_lvds1 {
-	status = "okay";
-};
+/* TODO: Apalis BKL1_PWM */
 
 /* Apalis DAP1 */
 &sai1 {

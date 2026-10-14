@@ -97,6 +97,7 @@ patternProperties:
       - reg
       - memory-controller
 
+
   '^edacpmd@':
     description: PMD subnode
     type: object

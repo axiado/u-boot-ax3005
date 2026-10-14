@@ -46,9 +46,7 @@ static int tps80031_bind(struct udevice *dev)
 	ofnode regulators_node;
 	int children, ret;
 
-	if (IS_ENABLED(CONFIG_SYSRESET_TPS80031) &&
-	    (dev_read_bool(dev, "ti,system-power-controller") ||
-	     dev_read_bool(dev, "system-power-controller"))) {
+	if (IS_ENABLED(CONFIG_SYSRESET_TPS80031)) {
 		ret = device_bind_driver(dev, TPS80031_RST_DRIVER,
 					 "sysreset", NULL);
 		if (ret) {

@@ -20,8 +20,11 @@
 #include <linux/delay.h>
 #include <linux/ioport.h>
 #include <dm/device_compat.h>
+#include <asm/global_data.h>
 
 #include "zynqmp_dpsub.h"
+
+DECLARE_GLOBAL_DATA_PTR;
 
 /* Maximum supported resolution */
 #define WIDTH				1024

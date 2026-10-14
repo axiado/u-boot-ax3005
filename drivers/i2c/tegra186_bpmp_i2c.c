@@ -117,7 +117,7 @@ static const struct udevice_id tegra186_bpmp_i2c_ids[] = {
 	{ }
 };
 
-U_BOOT_DRIVER(tegra186_bpmp_i2c) = {
+U_BOOT_DRIVER(i2c_gpio) = {
 	.name	= "tegra186_bpmp_i2c",
 	.id	= UCLASS_I2C,
 	.of_match = tegra186_bpmp_i2c_ids,

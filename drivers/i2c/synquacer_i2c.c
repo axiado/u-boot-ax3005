@@ -112,6 +112,8 @@
 #define SPEED_FM		400	// Fast Mode
 #define SPEED_SM		100	// Standard Mode
 
+DECLARE_GLOBAL_DATA_PTR;
+
 struct synquacer_i2c {
 	void __iomem *base;
 	unsigned long pclkrate;

@@ -1490,11 +1490,13 @@ static int sqfs_read_nest(const char *filename, void *buf, loff_t offset,
 		goto out;
 	}
 
-	/*
-	 * For FIT loading, the len is ALIGN, so it may exceed the actual size.
-	 * Let's just read the max.
-	 */
-	if (len && len < finfo.size) {
+	/* If the user specifies a length, check its sanity */
+	if (len) {
+		if (len > finfo.size) {
+			ret = -EINVAL;
+			goto out;
+		}
+
 		finfo.size = len;
 	} else {
 		len = finfo.size;

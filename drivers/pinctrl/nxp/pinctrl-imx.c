@@ -5,6 +5,7 @@
 
 #include <malloc.h>
 #include <mapmem.h>
+#include <asm/global_data.h>
 #include <dm/device_compat.h>
 #include <dm/devres.h>
 #include <linux/bitops.h>
@@ -14,6 +15,8 @@
 #include <dm/pinctrl.h>
 
 #include "pinctrl-imx.h"
+
+DECLARE_GLOBAL_DATA_PTR;
 
 int imx_pinctrl_set_state_common(struct udevice *dev, struct udevice *config,
 				 int pin_size, u32 **pin_data, int *npins)

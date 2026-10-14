@@ -289,11 +289,6 @@ static int rockchip_dram_init_banksize(void)
 }
 #endif
 
-__weak int rockchip_dram_init_banksize_fixup(struct bd_info *bd)
-{
-	return 0;
-}
-
 int dram_init_banksize(void)
 {
 	size_t ram_top = (unsigned long)(gd->ram_size + CFG_SYS_SDRAM_BASE);
@@ -347,7 +342,7 @@ int dram_init_banksize(void)
 #endif
 #endif
 
-	return rockchip_dram_init_banksize_fixup(gd->bd);
+	return 0;
 }
 
 u8 rockchip_sdram_type(phys_addr_t reg)

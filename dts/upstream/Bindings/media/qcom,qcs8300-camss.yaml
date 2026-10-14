@@ -120,14 +120,6 @@ properties:
     items:
       - const: top
 
-  vdda-phy-supply:
-    description:
-      Phandle to a 0.88V regulator supply to CSI PHYs.
-
-  vdda-pll-supply:
-    description:
-      Phandle to 1.2V regulator supply to CSI PHYs pll block.
-
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
 
@@ -168,8 +160,6 @@ required:
   - power-domains
   - power-domain-names
   - ports
-  - vdda-phy-supply
-  - vdda-pll-supply
 
 additionalProperties: false
 
@@ -337,9 +327,6 @@ examples:
 
             power-domains = <&camcc CAM_CC_TITAN_TOP_GDSC>;
             power-domain-names = "top";
-
-            vdda-phy-supply = <&vreg_l4a_0p88>;
-            vdda-pll-supply = <&vreg_l1c_1p2>;
 
             ports {
                 #address-cells = <1>;

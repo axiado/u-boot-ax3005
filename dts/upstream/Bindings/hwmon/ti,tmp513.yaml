@@ -20,6 +20,7 @@ description: |
   https://www.ti.com/lit/gpn/tmp513
   https://www.ti.com/lit/gpn/tmp512
 
+
 properties:
   compatible:
     enum:

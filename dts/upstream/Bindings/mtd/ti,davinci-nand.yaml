@@ -24,9 +24,7 @@ properties:
       - description: AEMIF control registers.
 
   partitions:
-    type: object
-    required:
-      - compatible
+    $ref: /schemas/mtd/partitions/partitions.yaml
 
   ti,davinci-chipselect:
     description:

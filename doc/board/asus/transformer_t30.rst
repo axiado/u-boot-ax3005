@@ -5,7 +5,7 @@ U-Boot for the ASUS Transformer device family
 
 ``DISCLAMER!`` Moving your ASUS Transformer to use U-Boot assumes replacement
 of the vendor ASUS bootloader. Vendor Android firmwares will no longer be
-able to run on the device. This replacement IS reversible if you have backups.
+able to run on the device. This replacement IS reversible.
 
 Quick Start
 -----------
@@ -45,51 +45,65 @@ Process U-Boot
 in re-crypt repo issues. NOT HERE!
 
 re-crypt is a tool that processes the ``u-boot-dtb-tegra.bin`` binary into form
-usable by device. This process is required only on the first installation or to
-recover the device in case of a failed update. You need to know your device
-individual SBK to continue.
+usable by device. This process is required only on the first installation or
+to recover the device in case of a failed update. You need to know your
+tablet's individual SBK to continue.
+
+Permanent installation can be performed either by using the nv3p protocol or by
+pre-loading just built U-Boot into RAM.
+
+Processing for the NV3P protocol
+********************************
 
 .. code-block:: bash
 
     $ git clone https://gitlab.com/grate-driver/re-crypt.git
     $ cd re-crypt # place your u-boot-dtb-tegra.bin here
-    $ ./re-crypt.py --dev tf201 --sbk <your sbk> --split
+    $ ./re-crypt.py --dev tf201 --sbk <your sbk>
 
 where SBK has next form ``0xXXXXXXXX`` ``0xXXXXXXXX`` ``0xXXXXXXXX`` ``0xXXXXXXXX``
 
-The script will produce ``bct.img`` and ``ebt.img`` ready to flash.
+The script will produce a ``repart-block.bin`` ready to flash.
 
-``NOTE!`` If you have TF700T it may have different sizes of boot0/boot1 partitions,
-re-crypt sets default boot partition size to 2MB and if you have different size
-add ``--bootsize`` key with yout boot partition size in bytes to the command.
+Processing for pre-loaded U-Boot
+********************************
+
+The procedure is the same, but the ``--split`` argument is used with the
+``re-crypt.py``. The script will produce ``bct.img`` and ``ebt.img`` ready
+to flash.
 
 Flashing U-Boot into the eMMC
 -----------------------------
 
-``DISCLAMER!`` All questions related to fusee-tools should be asked in the proper
+``DISCLAMER!`` All questions related to NvFlash should be asked in the proper
 place. NOT HERE! Flashing U-Boot will erase all eMMC, so make a backup before!
 
-Permanent installation can be performed by pre-loading just built U-Boot into RAM.
-Bct and bootloader will end up in boot0 and boot1 partitions of eMMC.
+Permanent installation can be performed either by using the nv3p protocol or by
+pre-loading just built U-Boot into RAM.
 
-You have to clone and prepare fusee-tools from here: https://gitlab.com/grate-driver/fusee-tools
-according to fusee-tools README to continue.
+Flashing with the NV3P protocol
+*******************************
 
-Bootloader preloading is performed to device in APX/RCM mode connected to host
-PC. This mode can be entered by holding ``power`` and ``volume up`` buttons on
-turned off tablet connected to the host PC. Host PC should detect APX USB
-device in ``lsusb``.
+Nv3p is a custom Nvidia protocol used to recover bricked devices. Devices can
+enter it by pre-loading vendor bootloader with the Fusée Gelée.
 
-U-Boot pre-loaded into RAM acts the same as when it was booted "cold". Currently
-U-Boot supports bootmenu entry fastboot, which allows to write a processed copy
-of U-Boot permanently into eMMC. This is how U-Boot can be preloaded using
-fusee-tools:
+With nv3p, ``repart-block.bin`` is used. It contains BCT and a bootloader in
+encrypted state in form, which can just be written RAW at the start of eMMC.
 
 .. code-block:: bash
 
-    $ ./run_bootloader.sh -s T30 -t ./bct/<dev>.bct --b u-boot-dtb-tegra.bin
+    $ ./run_bootloader.sh -s T30 -t ./bct/tf201.bct -b android_bootloader.bin
+    $ ./utiils/nvflash_v1.13.87205 --resume --rawdevicewrite 0 1024 repart-block.bin
 
-Where <dev> is your devie codename (``tf201``, ``tf300t``, ``tf700t`` etc.).
+When flashing is done, reboot the device. Note that you should adjust bct file
+name according to your device.
+
+Flashing with a pre-loaded U-Boot
+*********************************
+
+U-Boot pre-loaded into RAM acts the same as when it was booted "cold". Currently
+U-Boot supports bootmenu entry fastboot, which allows to write a processed copy
+of U-Boot permanently into eMMC.
 
 While pre-loading U-Boot, hold the ``volume down`` button which will trigger
 the bootmenu. There, select ``fastboot`` using the volume and power buttons.
@@ -109,14 +123,6 @@ Flashing U-Boot into the SPI Flash
 Some of Transformers use a separate 4 MB SPI flash, which contains all data
 required for boot. It is flashed from within U-Boot itself, preloaded into RAM
 using Fusée Gelée.
-
-Create ``repart-block.bin`` using re-crypt without ``--split`` key:
-
-.. code-block:: bash
-
-    $ git clone https://gitlab.com/grate-driver/re-crypt.git
-    $ cd re-crypt # place your u-boot-dtb-tegra.bin here
-    $ ./re-crypt.py --dev tf600t --sbk <your sbk>
 
 After creating your ``repart-block.bin`` you have to place it on a 1st partition
 of microSD card formated in fat. Then insert this microSD card into your tablet
@@ -141,8 +147,8 @@ device will enter bootmenu. Bootmenu contains entries to mount MicroSD and eMMC
 as mass storage, fastboot, reboot, reboot RCM, poweroff, enter U-Boot console
 and update bootloader (check the next chapter).
 
-Flashing ``bct.img`` and ``ebt.img`` eliminates vendor restrictions on eMMC and
-allows the user to use/partition it in any way the user desires.
+Flashing ``repart-block.bin`` eliminates vendor restrictions on eMMC and allows
+the user to use/partition it in any way the user desires.
 
 Self Upgrading
 --------------

@@ -969,7 +969,7 @@ static const struct udevice_id ehci_usb_ids[] = {
 	{ }
 };
 
-U_BOOT_DRIVER(ehci_tegra) = {
+U_BOOT_DRIVER(usb_ehci) = {
 	.name	= "ehci_tegra",
 	.id	= UCLASS_USB,
 	.of_match = ehci_usb_ids,

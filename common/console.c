@@ -1212,16 +1212,13 @@ int console_init_r(void)
 	list_for_each(pos, list) {
 		dev = list_entry(pos, struct stdio_dev, list);
 
-		if ((dev->flags & DEV_FLAGS_INPUT) &&
-		    (dev->priv == gd->cur_serial_dev || !inputdev))
+		if ((dev->flags & DEV_FLAGS_INPUT) && (inputdev == NULL)) {
 			inputdev = dev;
-
-		if ((dev->flags & DEV_FLAGS_OUTPUT) &&
-		    (dev->priv == gd->cur_serial_dev || !outputdev))
+		}
+		if ((dev->flags & DEV_FLAGS_OUTPUT) && (outputdev == NULL)) {
 			outputdev = dev;
-
-		/* The current serial console is the preferred stdio. */
-		if (dev->priv == gd->cur_serial_dev && inputdev && outputdev)
+		}
+		if(inputdev && outputdev)
 			break;
 	}
 

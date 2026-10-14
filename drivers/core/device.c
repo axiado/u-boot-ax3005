@@ -473,11 +473,7 @@ static int device_get_dma_constraints(struct udevice *dev)
 		return ret;
 	}
 
-#if CONFIG_IS_ENABLED(DM_DMA)
-	dev->dma_cpu = cpu;
-	dev->dma_bus = bus;
-	dev->dma_size = size;
-#endif
+	dev_set_dma_offset(dev, cpu - bus);
 
 	return 0;
 }

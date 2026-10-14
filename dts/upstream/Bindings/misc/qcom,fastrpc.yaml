@@ -18,9 +18,7 @@ description: |
 
 properties:
   compatible:
-    enum:
-      - qcom,kaanapali-fastrpc
-      - qcom,fastrpc
+    const: qcom,fastrpc
 
   label:
     enum:

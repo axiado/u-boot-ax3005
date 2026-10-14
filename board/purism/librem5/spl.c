@@ -29,6 +29,8 @@
 #include <linux/usb/gadget.h>
 #include "librem5.h"
 
+DECLARE_GLOBAL_DATA_PTR;
+
 void spl_dram_init(void)
 {
 	/* ddr init */
@@ -546,6 +548,8 @@ void board_init_f(ulong dummy)
 	gpio_request(WIFI_EN, "WIFI_EN");
 	gpio_direction_output(WIFI_EN, 1);
 #endif
+
+	board_early_init_f();
 
 	timer_init();
 

@@ -125,11 +125,11 @@ properties:
 
   vdda-phy-supply:
     description:
-      0.88V supply to CSIPHY IP blocks.
+      Phandle to a regulator supply to PHY core block.
 
   vdda-pll-supply:
     description:
-      1.2V supply to CSIPHY IP blocks.
+      Phandle to 1.8V regulator supply to PHY refclk pll block.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

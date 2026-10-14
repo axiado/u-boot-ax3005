@@ -11,6 +11,7 @@
 #include <net.h>
 #include <phy.h>
 #include <syscon.h>
+#include <asm/global_data.h>
 #include <asm/arch-rockchip/periph.h>
 #include <asm/arch-rockchip/clock.h>
 #include <asm/arch-rockchip/hardware.h>
@@ -27,6 +28,7 @@
 #include <linux/bitops.h>
 #include "designware.h"
 
+DECLARE_GLOBAL_DATA_PTR;
 #define DELAY_ENABLE(soc, tx, rx) \
 	(((tx) ? soc##_TXCLK_DLY_ENA_GMAC_ENABLE : soc##_TXCLK_DLY_ENA_GMAC_DISABLE) | \
 	((rx) ? soc##_RXCLK_DLY_ENA_GMAC_ENABLE : soc##_RXCLK_DLY_ENA_GMAC_DISABLE))

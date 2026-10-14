@@ -4,8 +4,9 @@
  */
 
 #include <adc.h>
-#include <stdio.h>
-#include <linux/kernel.h>
+#include <asm/global_data.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define KEY_DOWN_MIN_VAL        0
 #define KEY_DOWN_MAX_VAL        30

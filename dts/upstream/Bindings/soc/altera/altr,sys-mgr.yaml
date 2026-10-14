@@ -13,9 +13,7 @@ properties:
   compatible:
     oneOf:
       - description: Cyclone5/Arria5/Arria10
-        items:
-          - const: altr,sys-mgr
-          - const: syscon
+        const: altr,sys-mgr
       - description: Stratix10 SoC
         items:
           - const: altr,sys-mgr-s10
@@ -47,7 +45,7 @@ additionalProperties: false
 examples:
   - |
     sysmgr@ffd08000 {
-      compatible = "altr,sys-mgr", "syscon";
+      compatible = "altr,sys-mgr";
       reg = <0xffd08000 0x1000>;
       cpu1-start-addr = <0xffd080c4>;
     };

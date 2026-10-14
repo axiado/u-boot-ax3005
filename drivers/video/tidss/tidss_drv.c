@@ -42,6 +42,8 @@
 #include "tidss_regs.h"
 #include "tidss_oldi.h"
 
+DECLARE_GLOBAL_DATA_PTR;
+
 /* Panel parameters */
 enum {
 	LCD_MAX_WIDTH		= 1920,

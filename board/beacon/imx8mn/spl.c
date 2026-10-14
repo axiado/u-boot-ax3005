@@ -9,6 +9,7 @@
 #include <log.h>
 #include <asm/io.h>
 #include <errno.h>
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/arch/ddr.h>
 #include <asm/arch/imx8mn_pins.h>
@@ -30,6 +31,8 @@
 #include <dm/device.h>
 #include <dm/uclass-internal.h>
 #include <dm/device-internal.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {

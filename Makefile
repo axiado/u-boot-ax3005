@@ -531,7 +531,7 @@ UBOOTINCLUDE    := \
 		-I$(srctree)/lib/mbedtls/external/mbedtls/include) \
 	$(if $(CONFIG_$(PHASE_)SYS_THUMB_BUILD), \
 		$(if $(CONFIG_HAS_THUMB2), \
-			$(if $(CONFIG_CPU_V7M_V8M), \
+			$(if $(CONFIG_CPU_V7M), \
 				-I$(srctree)/arch/arm/thumb1/include), \
 			-I$(srctree)/arch/arm/thumb1/include)) \
 	-I$(srctree)/arch/$(ARCH)/include \
@@ -1050,7 +1050,7 @@ UBOOTINCLUDE    := \
 		-I$(srctree)/lib/mbedtls/external/mbedtls/include) \
 	$(if $(CONFIG_$(PHASE_)SYS_THUMB_BUILD), \
 		$(if $(CONFIG_HAS_THUMB2), \
-			$(if $(CONFIG_CPU_V7M_V8M), \
+			$(if $(CONFIG_CPU_V7M), \
 				-I$(srctree)/arch/arm/thumb1/include), \
 			-I$(srctree)/arch/arm/thumb1/include)) \
 	-I$(srctree)/arch/$(ARCH)/include \
@@ -1231,7 +1231,6 @@ ifneq ($(CONFIG_SPL_TARGET),)
 INPUTS-$(CONFIG_SPL) += $(CONFIG_SPL_TARGET:"%"=%)
 endif
 INPUTS-$(CONFIG_REMAKE_ELF) += u-boot.elf
-INPUTS-$(CONFIG_SPL_REMAKE_ELF) += spl/u-boot-spl.elf
 INPUTS-$(CONFIG_EFI_APP) += u-boot-app.efi
 INPUTS-$(CONFIG_EFI_STUB) += u-boot-payload.efi
 
@@ -1423,6 +1422,7 @@ endif
 
 PHONY += dtbs dtbs_check
 dtbs: dts/dt.dtb
+	@:
 dts/dt.dtb: dtbs_prepare u-boot
 	$(Q)$(MAKE) $(build)=dts dtbs
 
@@ -1446,14 +1446,10 @@ quiet_cmd_copy = COPY    $@
       cmd_copy = cp $< $@
 
 ifeq ($(CONFIG_OF_UPSTREAM),y)
-ifeq ($(CONFIG_CPU_V8M),y)
-dt_dir := dts/upstream/src/arm64
-else
 ifeq ($(CONFIG_ARM64),y)
 dt_dir := dts/upstream/src/arm64
 else
 dt_dir := dts/upstream/src/$(ARCH)
-endif
 endif
 else
 dt_dir := arch/$(ARCH)/dts
@@ -2005,15 +2001,6 @@ u-boot.elf: u-boot.bin u-boot-elf.lds FORCE
 	$(Q)$(OBJCOPY) -I binary $(PLATFORM_ELFFLAGS) $< u-boot-elf.o
 	$(call if_changed,u-boot-elf)
 
-quiet_cmd_u-boot-spl-elf ?= LD      $@
-	cmd_u-boot-spl-elf ?= $(LD) spl/u-boot-spl-elf.o -o $@ \
-	$(if $(CONFIG_SYS_BIG_ENDIAN),-EB,-EL) \
-	-T u-boot-elf.lds --defsym=$(CONFIG_PLATFORM_ELFENTRY)=$(CONFIG_SPL_TEXT_BASE) \
-	-Ttext=$(CONFIG_SPL_TEXT_BASE)
-spl/u-boot-spl.elf: spl/u-boot-spl.bin u-boot-elf.lds
-	$(Q)$(OBJCOPY) -I binary $(PLATFORM_ELFFLAGS) $< spl/u-boot-spl-elf.o
-	$(call if_changed,u-boot-spl-elf)
-
 u-boot-elf.lds: arch/u-boot-elf.lds prepare FORCE
 	$(call if_changed_dep,cpp_lds)
 
@@ -2151,7 +2138,6 @@ quiet_cmd_gen_envp = ENVP    $@
 			-D__ASSEMBLY__ \
 			-D__UBOOT_CONFIG__ \
 			-DDEFAULT_DEVICE_TREE=$(subst ",,$(CONFIG_DEFAULT_DEVICE_TREE)) \
-			-DDEFAULT_FDT_FILE=$(subst ",,$(CONFIG_DEFAULT_FDT_FILE)) \
 			-I . -I include -I $(srctree)/include \
 			-include linux/kconfig.h -include include/config.h \
 			-I$(srctree)/arch/$(ARCH)/include \
@@ -2751,19 +2737,21 @@ help:
 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
 	@echo  'For further info see the ./README file'
 
-run_tests = $(Q)env -u sub_make_done $(srctree)/test/run
+ifneq ($(filter tests pcheck qcheck tcheck,$(MAKECMDGOALS)),)
+export sub_make_done := 0
+endif
 
 tests check:
-	$(run_tests)
+	$(srctree)/test/run
 
 pcheck:
-	$(run_tests) parallel
+	$(srctree)/test/run parallel
 
 qcheck:
-	$(run_tests) quick
+	$(srctree)/test/run quick
 
 tcheck:
-	$(run_tests) tools
+	$(srctree)/test/run tools
 
 # Documentation targets
 # ---------------------------------------------------------------------------

@@ -20,7 +20,6 @@
 	panel: panel {
 		compatible = "lg,lb070wv8";
 		backlight = <&backlight>;
-		power-supply = <&reg_3p3v>;
 		enable-gpios = <&gpio6 15 GPIO_ACTIVE_HIGH>;
 
 		port {

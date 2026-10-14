@@ -166,6 +166,9 @@ patternProperties:
 required:
   - compatible
   - reg
+  - interrupts
+  - interrupt-controller
+  - '#interrupt-cells'
   - gpio-controller
   - '#gpio-cells'
   - regulators

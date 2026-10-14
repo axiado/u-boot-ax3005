@@ -14,9 +14,12 @@
 #include <sysreset.h>
 #include <time.h>
 #include <wdt.h>
+#include <asm/global_data.h>
 #include <dm/device-internal.h>
 #include <dm/lists.h>
 #include <linux/kernel.h>
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define WATCHDOG_TIMEOUT_SECS	(CONFIG_WATCHDOG_TIMEOUT_MSECS / 1000)
 

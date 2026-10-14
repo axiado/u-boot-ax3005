@@ -21,7 +21,7 @@
 	compatible = "ti,am33xx";
 
 	chosen {
-		stdout-path = "serial3:115200n8";
+		stdout-path = &uart3;
 	};
 
 	cpus {

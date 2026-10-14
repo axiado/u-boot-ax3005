@@ -6,8 +6,6 @@
 #include <linux/iopoll.h>
 #include <miiphy.h>
 
-#include "mdio-mt7531-mmio.h"
-
 #define MT7531_PHY_IAC			0x701c
 #define   MT7531_PHY_ACS_ST		BIT(31)
 #define   MT7531_MDIO_REG_ADDR_CL22	GENMASK(29, 25)
@@ -27,7 +25,11 @@
 #define MT7531_MDIO_TIMEOUT		100000
 #define MT7531_MDIO_SLEEP		20
 
-static int mt7531_mdio_wait_busy(struct mt7531_mdio_mmio_priv *priv)
+struct mt7531_mdio_priv {
+	phys_addr_t switch_regs;
+};
+
+static int mt7531_mdio_wait_busy(struct mt7531_mdio_priv *priv)
 {
 	unsigned int busy;
 
@@ -36,7 +38,7 @@ static int mt7531_mdio_wait_busy(struct mt7531_mdio_mmio_priv *priv)
 					MT7531_MDIO_SLEEP, MT7531_MDIO_TIMEOUT);
 }
 
-static int mt7531_mdio_read(struct mt7531_mdio_mmio_priv *priv, int addr, int devad, int reg)
+static int mt7531_mdio_read(struct mt7531_mdio_priv *priv, int addr, int devad, int reg)
 {
 	u32 val;
 
@@ -73,7 +75,7 @@ static int mt7531_mdio_read(struct mt7531_mdio_mmio_priv *priv, int addr, int de
 	return val & MT7531_MDIO_RW_DATA;
 }
 
-static int mt7531_mdio_write(struct mt7531_mdio_mmio_priv *priv, int addr, int devad,
+static int mt7531_mdio_write(struct mt7531_mdio_priv *priv, int addr, int devad,
 			     int reg, u16 value)
 {
 	u32 val;
@@ -113,7 +115,7 @@ static int mt7531_mdio_write(struct mt7531_mdio_mmio_priv *priv, int addr, int d
 
 int mt7531_mdio_mmio_read(struct mii_dev *bus, int addr, int devad, int reg)
 {
-	struct mt7531_mdio_mmio_priv *priv = bus->priv;
+	struct mt7531_mdio_priv *priv = bus->priv;
 
 	return mt7531_mdio_read(priv, addr, devad, reg);
 }
@@ -121,14 +123,14 @@ int mt7531_mdio_mmio_read(struct mii_dev *bus, int addr, int devad, int reg)
 int mt7531_mdio_mmio_write(struct mii_dev *bus, int addr, int devad,
 			   int reg, u16 value)
 {
-	struct mt7531_mdio_mmio_priv *priv = bus->priv;
+	struct mt7531_mdio_priv *priv = bus->priv;
 
 	return mt7531_mdio_write(priv, addr, devad, reg, value);
 }
 
 static int dm_mt7531_mdio_read(struct udevice *dev, int addr, int devad, int reg)
 {
-	struct mt7531_mdio_mmio_priv *priv = dev_get_priv(dev);
+	struct mt7531_mdio_priv *priv = dev_get_priv(dev);
 
 	return mt7531_mdio_read(priv, addr, devad, reg);
 }
@@ -136,7 +138,7 @@ static int dm_mt7531_mdio_read(struct udevice *dev, int addr, int devad, int reg
 static int dm_mt7531_mdio_write(struct udevice *dev, int addr, int devad,
 				int reg, u16 value)
 {
-	struct mt7531_mdio_mmio_priv *priv = dev_get_priv(dev);
+	struct mt7531_mdio_priv *priv = dev_get_priv(dev);
 
 	return mt7531_mdio_write(priv, addr, devad, reg, value);
 }
@@ -148,7 +150,7 @@ static const struct mdio_ops mt7531_mdio_ops = {
 
 static int mt7531_mdio_probe(struct udevice *dev)
 {
-	struct mt7531_mdio_mmio_priv *priv = dev_get_priv(dev);
+	struct mt7531_mdio_priv *priv = dev_get_priv(dev);
 	ofnode switch_node;
 
 	switch_node = ofnode_get_parent(dev_ofnode(dev));
@@ -167,5 +169,5 @@ U_BOOT_DRIVER(mt7531_mdio) = {
 	.id             = UCLASS_MDIO,
 	.probe          = mt7531_mdio_probe,
 	.ops            = &mt7531_mdio_ops,
-	.priv_auto	  = sizeof(struct mt7531_mdio_mmio_priv),
+	.priv_auto	  = sizeof(struct mt7531_mdio_priv),
 };

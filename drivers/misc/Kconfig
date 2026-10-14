@@ -86,7 +86,6 @@ config GATEWORKS_SC
 config QCOM_GENI
 	bool "Qualcomm Generic Interface (GENI) driver"
 	depends on MISC
-	select EFI_PARTITION
 	select PARTITION_TYPE_GUID
 	help
 	  Enable support for Qualcomm GENI and it's peripherals. GENI is responseible
@@ -257,7 +256,7 @@ config VPL_CROS_EC_LPC
 
 config CROS_EC_SANDBOX
 	bool "Enable Chrome OS EC sandbox driver"
-	depends on CROS_EC && SANDBOX && HASH
+	depends on CROS_EC && SANDBOX
 	help
 	  Enable a sandbox emulation of the Chrome OS EC. This supports
 	  keyboard (use the -l flag to enable the LCD), verified boot context,
@@ -351,8 +350,7 @@ config MXS_OCOTP
 
 config NPCM_HOST
 	bool "Enable support espi or LPC for Host"
-	depends on SYSCON
-	select REGMAP
+	depends on REGMAP && SYSCON
 	help
 	  Enable NPCM BMC espi or LPC support for Host reading and writing.
 

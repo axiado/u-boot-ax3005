@@ -99,6 +99,8 @@
 #define TXBIT	1
 #define RXBIT	2
 
+DECLARE_GLOBAL_DATA_PTR;
+
 struct synquacer_spi_plat {
 	void __iomem *base;
 	bool aces, rtm;

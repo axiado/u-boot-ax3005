@@ -203,10 +203,6 @@
 	status = "okay";
 };
 
-&gpu_zap_shader {
-	firmware-name = "qcom/apq8096/a530_zap.mbn";
-};
-
 &hsusb_phy1 {
 	status = "okay";
 

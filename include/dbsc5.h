@@ -50,7 +50,7 @@ struct renesas_dbsc5_board_config {
 		u8 bdcfg_dm_swap[SLICE_CNT];
 		/* SoC ckeX([1][0]) -> MEM csY */
 		u8 bdcfg_cs_swap;
-	} ch[DRAM_CH_CNT];
+	} ch[4];
 };
 
 #endif	/* __INCLUDE_DBSC5_H__ */

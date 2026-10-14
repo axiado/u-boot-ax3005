@@ -6,6 +6,7 @@
  * Written by Jean-Jacques Hiblot <jjhiblot@ti.com>
  */
 
+#include <asm/global_data.h>
 #include <asm/io.h>
 #include <dm.h>
 #include <errno.h>
@@ -37,6 +38,8 @@
 #define USB2PHY_CHRG_DET		 0x14
 #define USB2PHY_USE_CHG_DET_REG		BIT(29)
 #define USB2PHY_DIS_CHG_DET		BIT(28)
+
+DECLARE_GLOBAL_DATA_PTR;
 
 struct omap_usb2_phy {
 	struct regmap *pwr_regmap;

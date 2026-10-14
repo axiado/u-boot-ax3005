@@ -16,7 +16,7 @@
 	};
 
 	chosen {
-		stdout-path = "serial0:115200n8";
+		stdout-path = &uart0;
 	};
 
 	leds {
@@ -217,7 +217,7 @@
 	};
 
 	baseboard_eeprom: eeprom@50 {
-		compatible = "atmel,24c32";
+		compatible = "atmel,24c256";
 		reg = <0x50>;
 		vcc-supply = <&ldo4_reg>;
 

@@ -14,9 +14,7 @@
 
 static const struct pmic_child_info pmic_children_info[] = {
 	{ .prefix = "sw", .driver = CPCAP_SW_DRIVER },
-	{ .prefix = "SW", .driver = CPCAP_SW_DRIVER },
 	{ .prefix = "v", .driver = CPCAP_LDO_DRIVER },
-	{ .prefix = "V", .driver = CPCAP_LDO_DRIVER },
 	{ },
 };
 
@@ -114,8 +112,6 @@ static struct dm_pmic_ops cpcap_ops = {
 static const struct udevice_id cpcap_ids[] = {
 	{ .compatible = "motorola,cpcap" },
 	{ .compatible = "st,6556002" },
-	{ .compatible = "motorola,mapphone-cpcap" },
-	{ .compatible = "motorola,mot-cpcap" },
 	{ }
 };
 

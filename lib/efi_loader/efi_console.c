@@ -365,9 +365,6 @@ void efi_setup_console_size(void)
 	int rows = 25, cols = 80;
 	int ret = -ENODEV;
 
-	if (IS_ENABLED(CONFIG_EFI_CONSOLE_DISABLE_ANSI))
-		efi_console_set_ansi(false);
-
 	if (IS_ENABLED(CONFIG_VIDEO))
 		ret = query_vidconsole(&rows, &cols);
 	if (ret) {

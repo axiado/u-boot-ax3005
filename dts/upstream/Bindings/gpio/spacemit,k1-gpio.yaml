@@ -19,9 +19,7 @@ properties:
     pattern: "^gpio@[0-9a-f]+$"
 
   compatible:
-    enum:
-      - spacemit,k1-gpio
-      - spacemit,k3-gpio
+    const: spacemit,k1-gpio
 
   reg:
     maxItems: 1

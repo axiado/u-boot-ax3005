@@ -643,10 +643,10 @@
 
 &gpu {
 	status = "okay";
-};
 
-&gpu_zap_shader {
-	firmware-name = "qcom/sm8450/a730_zap.mbn";
+	zap-shader {
+		firmware-name = "qcom/sm8450/a730_zap.mbn";
+	};
 };
 
 &i2c9 {

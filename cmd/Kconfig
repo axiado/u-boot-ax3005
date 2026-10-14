@@ -223,7 +223,6 @@ config CMD_LICENSE
 
 config CMD_PMC
 	bool "pmc"
-	depends on ACPI_PMC
 	help
 	  Provides access to the Intel Power-Management Controller (PMC) so
 	  that its state can be examined. This does not currently support
@@ -292,7 +291,6 @@ menu "Boot commands"
 
 config CMD_BOOTD
 	bool "bootd"
-	depends on CMD_BOOTM
 	default y
 	help
 	  Run the command stored in the environment "bootcmd", i.e.
@@ -300,7 +298,6 @@ config CMD_BOOTD
 
 config CMD_BOOTM
 	bool "bootm"
-	depends on LMB
 	default y
 	select LIB_BOOTM
 	help
@@ -379,7 +376,6 @@ config BOOTM_ELF
 
 config CMD_BOOTZ
 	bool "bootz"
-	depends on LMB
 	select LIB_BOOTZ
 	select LIB_BOOTM
 	help
@@ -388,7 +384,6 @@ config CMD_BOOTZ
 config CMD_BOOTI
 	bool "booti"
 	depends on ARM64 || RISCV || SANDBOX
-	depends on LMB
 	default y
 	select LIB_BOOTI
 	select LIB_BOOTM
@@ -718,7 +713,6 @@ config CMD_GREPENV
 
 config CMD_SAVEENV
 	bool "saveenv"
-	depends on !(SRIO_PCIE_BOOT_SLAVE && ENV_IS_IN_REMOTE)
 	default y
 	help
 	  Save all environment variables into the compiled-in persistent
@@ -1395,7 +1389,7 @@ config CMD_I3C
 	  and perform read and write on the connected i3c devices.
 
 config CMD_W1
-	depends on W1 && W1_EEPROM
+	depends on W1
 	default y if W1
 	bool "w1 - Support for Dallas 1-Wire protocol"
 	help
@@ -1414,7 +1408,6 @@ config CMD_LOADM
 
 config CMD_LOADS
 	bool "loads - Load a file over serial in S-Record format"
-	depends on LMB
 	default y
 	help
 	  Load an S-Record file over serial line
@@ -1670,15 +1663,6 @@ config CMD_PART
 	  Read and display information about the partition table on
 	  various media.
 
-config CMD_PART_DUPCHECK
-	bool "part dupcheck"
-	depends on CMD_PART && BLK
-	help
-	  Adds the 'part dupcheck' subcommand, which scans all block devices
-	  and reports any duplicate partition UUIDs (PARTUUIDs) or partition
-	  labels (PARTLABELs). Returns failure if any duplicates are found,
-	  making it suitable for use in boot scripts.
-
 config CMD_PCI
 	bool "pci - Access PCI devices"
 	help
@@ -1731,8 +1715,7 @@ config CMD_REMOTEPROC
 
 config CMD_SATA
 	bool "sata - Access SATA subsystem"
-	depends on SATA && AHCI
-	default y
+	select SATA
 	help
 	  SATA (Serial Advanced Technology Attachment) is a serial bus
 	  standard for connecting to hard drives and other storage devices.
@@ -2101,7 +2084,7 @@ config BOOTP_PXE_DHCP_OPTION
 config BOOTP_VCI_STRING
 	string
 	depends on CMD_BOOTP
-	default "U-Boot.armv7" if CPU_V7A || CPU_V7M_V8M || CPU_V7R
+	default "U-Boot.armv7" if CPU_V7A || CPU_V7M || CPU_V7R
 	default "U-Boot.armv8" if ARM64
 	default "U-Boot.arm" if ARM
 	default "U-Boot"
@@ -2203,7 +2186,6 @@ endif  # if NET
 config CMD_DHCP
 	bool "dhcp"
 	select PROT_DHCP_LWIP if NET_LWIP
-	select CMD_BOOTP if NET
 	help
 	  Boot image via network using DHCP/TFTP protocol
 
@@ -2238,7 +2220,6 @@ config CMD_MDIO
 
 config CMD_NFS
 	bool "nfs"
-	select PROT_UDP_LWIP if NET_LWIP
 	help
 	  Boot image via network using NFS protocol.
 
@@ -2323,7 +2304,7 @@ config WGET_BUILTIN_CACERT_PATH
 config CMD_PXE
 	bool "pxe"
 	select PXE_UTILS
-	select CMD_TFTPBOOT
+	imply CMD_TFTPBOOT
 	help
 	  Boot image via network using PXE protocol
 

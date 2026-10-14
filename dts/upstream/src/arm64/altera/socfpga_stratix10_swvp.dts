@@ -62,6 +62,7 @@
 &gmac0 {
 	status = "okay";
 	phy-mode = "rgmii";
+	phy-addr = <0xffffffff>;
 };
 
 &gmac1 {
@@ -72,6 +73,7 @@
 &gmac2 {
 	status = "okay";
 	phy-mode = "rgmii";
+	phy-addr = <0xffffffff>;
 };
 
 &mmc {
@@ -102,4 +104,5 @@
 
 &sysmgr {
 	reg = <0xffd12000 0x1000>;
+	interrupts = <0x0 0x10 0x4>;
 };

@@ -11,6 +11,7 @@
 #include <init.h>
 #include <net.h>
 #include <scsi.h>
+#include <asm/global_data.h>
 
 #include <linux/sizes.h>
 #include <asm/io.h>
@@ -35,6 +36,8 @@
 #define HB_SCU_A9_PWR_NORMAL		0
 #define HB_SCU_A9_PWR_DORMANT		2
 #define HB_SCU_A9_PWR_OFF		3
+
+DECLARE_GLOBAL_DATA_PTR;
 
 void cphy_disable_overrides(void);
 

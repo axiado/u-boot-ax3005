@@ -54,12 +54,10 @@ patternProperties:
 
     properties:
       spi-rx-bus-width:
-        items:
-          - enum: [1, 2, 4]
+        enum: [1, 2, 4]
 
       spi-tx-bus-width:
-        items:
-          - enum: [1, 2, 4]
+        enum: [1, 2, 4]
 
 required:
   - compatible

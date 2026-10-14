@@ -11,11 +11,7 @@ maintainers:
 
 properties:
   compatible:
-    oneOf:
-      - items:
-          - const: microchip,pic64gx-mailbox
-          - const: microchip,mpfs-mailbox
-      - const: microchip,mpfs-mailbox
+    const: microchip,mpfs-mailbox
 
   reg:
     oneOf:

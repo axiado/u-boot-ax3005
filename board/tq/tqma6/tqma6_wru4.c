@@ -33,7 +33,7 @@
 #include <mmc.h>
 #include <netdev.h>
 
-#include "../common/tq_bb.h"
+#include "tqma6_bb.h"
 
 /* UART */
 #define UART4_PAD_CTRL (			\
@@ -95,7 +95,7 @@ static struct fsl_esdhc_cfg usdhc2_cfg = {
 	.max_bus_width = 4,
 };
 
-int tq_bb_board_mmc_getcd(struct mmc *mmc)
+int tqma6_bb_board_mmc_getcd(struct mmc *mmc)
 {
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	int ret = 0;
@@ -106,7 +106,7 @@ int tq_bb_board_mmc_getcd(struct mmc *mmc)
 	return ret;
 }
 
-int tq_bb_board_mmc_getwp(struct mmc *mmc)
+int tqma6_bb_board_mmc_getwp(struct mmc *mmc)
 {
 	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
 	int ret = 0;
@@ -117,7 +117,7 @@ int tq_bb_board_mmc_getwp(struct mmc *mmc)
 	return ret;
 }
 
-int tq_bb_board_mmc_init(struct bd_info *bis)
+int tqma6_bb_board_mmc_init(struct bd_info *bis)
 {
 	int ret;
 
@@ -256,14 +256,14 @@ static void gpio_init(void)
 		gpio_direction_output(GPIO_UART3_PWRON, 0);
 }
 
-int tq_bb_board_early_init_f(void)
+int tqma6_bb_board_early_init_f(void)
 {
 	setup_iomuxc_uart4();
 
 	return 0;
 }
 
-int tq_bb_board_init(void)
+int tqma6_bb_board_init(void)
 {
 	setup_iomuxc_enet();
 
@@ -279,7 +279,12 @@ int tq_bb_board_init(void)
 	return 0;
 }
 
-const char *tq_bb_get_boardname(void)
+int tqma6_bb_board_late_init(void)
+{
+	return 0;
+}
+
+const char *tqma6_bb_get_boardname(void)
 {
 	return "WRU-IV";
 }
@@ -326,3 +331,13 @@ int board_ehci_power(int port, int on)
 
 	return 0;
 }
+
+/*
+ * Device Tree Support
+ */
+#if defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT)
+void tqma6_bb_ft_board_setup(void *blob, struct bd_info *bd)
+{
+	/* TBD */
+}
+#endif /* defined(CONFIG_OF_BOARD_SETUP) && defined(CONFIG_OF_LIBFDT) */
