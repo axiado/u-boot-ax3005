@@ -83,6 +83,7 @@
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
 			clock-frequency = <100000000>;
+			bootph-pre-reloc;
 		};
 	};
 
@@ -162,6 +163,7 @@
 			clock-frequency = <100000>;
 			#address-cells = <1>;
 			#size-cells = <0>;
+			bootph-pre-reloc;
 			status = "disabled";
 		};
 	};

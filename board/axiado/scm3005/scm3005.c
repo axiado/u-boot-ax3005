@@ -16,12 +16,15 @@
 #include <env_internal.h>
 #include <command.h>
 #include <net.h>
+#include <i2c.h>
+#include <linux/kernel.h>
 #include <linux/types.h>
 #include <asm/system.h>
 
 /* Defined in ax_devcfg.c */
 u32 ax_counter_freq_from_devcfg(void);
-u32 get_uart_address_from_devcfg(void);
+
+static int get_uart_index_from_fru(void);
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -49,17 +52,12 @@ int board_fit_config_name_match(const char *name)
 }
 
 /*
- * uart4_is_console - does the dev-cfg handoff blob select UART4 as console?
+ * uart4_is_console - does the FRU EEPROM select UART4 as console?
  *
- * Safe to call before relocation: it reads the control FDT and the handoff
- * blob only, and writes no global or static storage.
  */
 static bool uart4_is_console(void)
 {
-	int node = fdt_path_offset(gd->fdt_blob, "serial4"); /* uses the alias */
-
-	return get_uart_address_from_devcfg() ==
-	       fdtdec_get_addr_size(gd->fdt_blob, node, "reg", NULL);
+	return get_uart_index_from_fru() == 4;
 }
 
 /*
@@ -118,7 +116,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	}
 
 	/*
-	 * The console UART is selected at runtime from the dev-cfg handoff
+	 * The console UART is selected at runtime from FRU data saved on EEPROM
 	 * blob, so hand the kernel a matching devicetree: disable uart3 so no
 	 * ttyPS3 is registered, and repoint stdout-path, which is what a bare
 	 * "earlycon" resolves through (console= only takes effect once the
@@ -218,7 +216,6 @@ int board_init(void)
 	 * ran at EL3). timer_init itself runs pre-console, so it can't print. */
 	printf("board_init: dev-cfg counter freq = %u Hz, CNTFRQ_EL0 = %u Hz (EL%u)\n",
 	       ax_counter_freq_from_devcfg(), raw_read_cntfrq_el0(), current_el());
-	printf("dev-cfg UART address = 0x%x\n", get_uart_address_from_devcfg());
 	return 0;
 }
 
@@ -275,6 +272,150 @@ void set_pad_in_uboot_state(void)
 	writel(pad_val.raw, AX3005_SCRATCHPAD_ADDR);
 }
 
+/* BMC FRU EEPROM (24c16) on I2C10 */
+#define FRU_I2C_BUS		10
+#define FRU_I2C_ADDR		0x50
+#define FRU_I2C_OFFSET_LEN	1	/* 1-byte word address */
+#define FRU_I2C_ADDR_MASK	0x7	/* offset bits 10:8 go in the chip address */
+#define FRU_I2C_BLOCK_SIZE	256	/* bytes per chip address */
+#define FRU_EEPROM_SIZE		2048
+#define FRU_HDR_LEN		8	/* IPMI FRU common header */
+#define FRU_HDR_VERSION		0x01
+#define FRU_UART_INDEX_OFFSET		0x18	/* u8 */
+#define FRU_MAC_ADDR_OFFSET		0x19
+#define FRU_PORTMAP_OFFSET		0x1E	/* u8, bit 0-3 -> MAC-1..4, bit 4 -> MAC-0 */
+#define AX_PORTMAP_MASK			GENMASK(4, 0)	/* MAC-1..MAC-4, MAC-0 */
+#define AX_PORTMAP_MAC0_BIT		4	/* bit 4 -> MAC-0 */
+#define AX_DEFAULT_MACID		1	/* MAC port #1 */
+
+/**
+ * @brief read FRU data from the EEPROM on I2C10
+ *
+ * The 24c16 answers on 0x50-0x57, one address per 256-byte block, so the
+ * read is split at block boundaries.
+ *
+ * @param offset byte offset in the EEPROM
+ * @param buf    destination buffer
+ * @param len    number of bytes to read
+ *
+ * @return 0 on success, negative errno on failure
+ */
+static int scm3005_get_fru_data(uint offset, u8 *buf, uint len)
+{
+	struct udevice *dev;
+	uint chunk;
+	int ret;
+
+	if (offset >= FRU_EEPROM_SIZE || len > FRU_EEPROM_SIZE - offset)
+		return -EINVAL;
+
+	ret = i2c_get_chip_for_busnum(FRU_I2C_BUS, FRU_I2C_ADDR,
+				      FRU_I2C_OFFSET_LEN, &dev);
+	if (ret)
+		return ret;
+
+	ret = i2c_set_chip_addr_offset_mask(dev, FRU_I2C_ADDR_MASK);
+	if (ret)
+		return ret;
+
+	while (len) {
+		chunk = min(len, FRU_I2C_BLOCK_SIZE - offset % FRU_I2C_BLOCK_SIZE);
+		ret = dm_i2c_read(dev, offset, buf, chunk);
+		if (ret)
+			return ret;
+		offset += chunk;
+		buf += chunk;
+		len -= chunk;
+	}
+
+	return 0;
+}
+
+/**
+ * @brief get the console UART index stored in the FRU EEPROM
+ *
+ * @param void
+ *
+ * @return UART index on success, or a negative errno if the read fails
+ */
+static int get_uart_index_from_fru(void)
+{
+	u8 index;
+	int ret;
+
+	ret = scm3005_get_fru_data(FRU_UART_INDEX_OFFSET, &index, 1);
+	if (ret) {
+		printf("FRU: failed to read UART index (%d)\n", ret);
+		return ret;
+	}
+
+	return index;
+}
+
+/**
+ * @brief get the first MAC address stored in the FRU EEPROM
+ *
+ * @param mac destination for the ARP_HLEN-byte MAC address
+ *
+ * @return 0 on success, -EINVAL if the stored address isn't a valid
+ *         unicast MAC, or another negative errno if the read fails
+ */
+static int get_mac_address_from_fru(u8 *mac)
+{
+	int ret;
+
+	ret = scm3005_get_fru_data(FRU_MAC_ADDR_OFFSET, mac, ARP_HLEN);
+	if (ret) {
+		printf("FRU: failed to read MAC address (%d)\n", ret);
+		return ret;
+	}
+
+	if (!is_valid_ethaddr(mac)) {
+		printf("FRU: invalid MAC address %pM\n", mac);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+/**
+ * @brief get the MAC port id (macid) from the FRU port map
+ *
+ * Port map bits: bit 0 -> MAC-1, bit 1 -> MAC-2, bit 2 -> MAC-3,
+ * bit 3 -> MAC-4, bit 4 -> MAC-0.
+ * If more than one port is enabled, the lowest bit is used, so MAC-1..4
+ * take priority over MAC-0.
+ *
+ * @param void
+ *
+ * @return macid (0-4) on success, -ENOENT if no port bit is set, or
+ *         another negative errno if the read fails
+ */
+static int get_macid_from_fru(void)
+{
+	u8 portmap, ports;
+	int bit, ret;
+
+	ret = scm3005_get_fru_data(FRU_PORTMAP_OFFSET, &portmap, 1);
+	if (ret) {
+		printf("FRU: failed to read port map (%d)\n", ret);
+		return ret;
+	}
+
+	ports = portmap & AX_PORTMAP_MASK;
+	if (!ports) {
+		printf("FRU: no MAC port enabled in port map 0x%02x\n",
+		       portmap);
+		return -ENOENT;
+	}
+
+	bit = ffs(ports) - 1;
+	if (bit == AX_PORTMAP_MAC0_BIT)
+		return 0;
+
+	return bit + 1;
+}
+
 /*
  * board_late_init - runs at the end of U-Boot init, just before the
  * autoboot/console prompt. Stamp the scratchpad to indicate U-Boot has
@@ -283,11 +424,13 @@ void set_pad_in_uboot_state(void)
  */
 int board_late_init(void)
 {
+	u8 mac[ARP_HLEN];
+	int ret;
+
 	set_pad_in_uboot_state();
 	/* defaults in use => the eMMC copy was unusable (bad CRC or read error) */
 	if (gd->flags & GD_FLG_ENV_DEFAULT) {
-		int ret = env_save();
-
+		ret = env_save();
 		if (ret)
 			printf("WARNING: Failed to write default environment (%d)\n",
 			       ret);
@@ -296,6 +439,26 @@ int board_late_init(void)
 	/* console=ttyPS3 --> console=ttyPS4 when dev-cfg selects UART4 */
 	if (uart4_is_console())
 		env_set("bootargs", AX_BOOTARGS_UART4);
+
+	printf("FRU UART Index: %d\n", get_uart_index_from_fru());
+
+	ret = get_mac_address_from_fru(mac);
+	if (!ret)
+		printf("FRU MAC Addr: %pM\n", mac);
+
+	/* Runs before initr_net(), so the Ethernet driver picks this up */
+	if (!ret && !env_get("ethaddr"))
+		eth_env_set_enetaddr("ethaddr", mac);
+
+	/* axiado-eth needs macid (0-4) to know which MAC port to program */
+	if (!env_get("macid")) {
+		ret = get_macid_from_fru();
+		if (ret < 0) {
+			printf("FRU: using default macid %d\n", AX_DEFAULT_MACID);
+			ret = AX_DEFAULT_MACID;
+		}
+		env_set_ulong("macid", ret);
+	}
 
 	return 0;
 }
