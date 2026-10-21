@@ -12,6 +12,7 @@
 	aliases {
 		serial3 = &uart3;
 		serial4 = &uart4;
+		i2c10 = &i2c16;
 	};
 
 	cpus {
@@ -76,6 +77,13 @@
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
 			clock-frequency = <200000000>;
+		};
+
+		pclk: clock-100000000 {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <100000000>;
+			bootph-pre-reloc;
 		};
 	};
 
@@ -143,6 +151,19 @@
 		mac0: ethernet@43100400 {
 			compatible = "axiado,ax3005-mac";
 			reg = <0x0 0x43100400 0x0 0x400>;
+			status = "disabled";
+		};
+
+		i2c16: i2c@33120400 {
+			compatible = "axiado,ax3000-i2c", "cdns,i2c-r1p14";
+			reg = <0x0 0x33120400 0x0 0x400>;
+			clocks = <&pclk>;
+			interrupt-parent = <&gic500>;
+			interrupts = <GIC_SPI 92 IRQ_TYPE_LEVEL_HIGH>;
+			clock-frequency = <100000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			bootph-pre-reloc;
 			status = "disabled";
 		};
 	};

@@ -51,9 +51,9 @@ static int axiado_net_write_hwaddr(struct udevice *dev)
 	}
 
 	mac_index = simple_strtoul(macid, NULL, 10);
-	/* MAC Index range is 1 ~ 4 */
-	if (mac_index > 4 || mac_index < 1) {
-		printf("MAC id is not set\n");
+	/* MAC Index range is 0 ~ 4 */
+	if (mac_index > 4) {
+		printf("MAC id %lu is out of range (0-4)\n", mac_index);
 		return -ENOENT;
 	}
 
@@ -63,7 +63,7 @@ static int axiado_net_write_hwaddr(struct udevice *dev)
 	mac1 = ((uint32_t)mac[5] << 8) | ((uint32_t)mac[4] << 0);
 
 	mac_base = pdata->iobase + mac_index * MAC_CONFIG_BYTE_CNT;
-	/* program the MAC regs of port #1 */
+	/* program the MAC regs of port #mac_index */
 	writel(mac0, mac_base + R_MAC_0);
 	writel(mac1, mac_base + R_MAC_1);
 
