@@ -416,6 +416,36 @@ static int get_macid_from_fru(void)
 	return bit + 1;
 }
 
+/**
+ * @brief make the default boot command honour the fdt_conf variable
+ *
+ * When fdt_conf names a FIT configuration, boot "<loadaddr>#<fdt_conf>" so
+ * the matching kernel/DTB pair is selected. A bootcmd the user customised
+ * is left alone, and with fdt_conf unset the FIT default is used.
+ *
+ * @param void
+ *
+ * @return None
+ */
+static void setup_fdt_conf_bootcmd(void)
+{
+	const char *fdt_conf = env_get("fdt_conf");
+	const char *bootcmd = env_get("bootcmd");
+
+	if (!fdt_conf || !*fdt_conf) {
+		printf("WARNING: fdt_conf not set, using the FIT default configuration\n"
+		       "Set one with 'setenv fdt_conf <config-name>'\n");
+		return;
+	}
+
+	if (bootcmd &&
+	    strncmp(bootcmd, CONFIG_BOOTCOMMAND, sizeof(CONFIG_BOOTCOMMAND)))
+		return;
+
+	printf("Using DTB configuration: %s\n", fdt_conf);
+	env_set("bootcmd", "bootm ${loadaddr}#${fdt_conf}");
+}
+
 /*
  * board_late_init - runs at the end of U-Boot init, just before the
  * autoboot/console prompt. Stamp the scratchpad to indicate U-Boot has
@@ -439,6 +469,8 @@ int board_late_init(void)
 	/* console=ttyPS3 --> console=ttyPS4 when dev-cfg selects UART4 */
 	if (uart4_is_console())
 		env_set("bootargs", AX_BOOTARGS_UART4);
+
+	setup_fdt_conf_bootcmd();
 
 	printf("FRU UART Index: %d\n", get_uart_index_from_fru());
 
