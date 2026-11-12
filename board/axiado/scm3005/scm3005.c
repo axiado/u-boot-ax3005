@@ -23,6 +23,7 @@
 
 /* Defined in ax_devcfg.c */
 u32 ax_counter_freq_from_devcfg(void);
+u32 ax_cpu_clock_from_devcfg(void);
 
 static int get_uart_index_from_fru(void);
 
@@ -113,6 +114,28 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 			printf("WARNING: Failed to set timer clock-frequency\n");
 		else
 			printf("fdt board setup: timer clock-frequency = %u Hz\n", freq);
+	}
+
+	/*
+	 * CPU-PLL port 0 (CPU_CLOCK) is described as a fixed-clock; pclk and
+	 * the other SP* peripheral clocks are fixed-factor children of it.
+	 * When dev-cfg re-programs the port 0 divider, update only the parent
+	 * so Linux derives the children itself. With no override the DT's
+	 * nominal rate is already correct.
+	 */
+	{
+		u32 freq = ax_cpu_clock_from_devcfg();
+
+		if (freq) {
+			offset = fdt_path_offset(blob, "/clocks/clock-cpu-pll-port0");
+			if (offset < 0)
+				printf("WARNING: No CPU PLL port 0 clock node, peripheral clocks may be wrong\n");
+			else if (fdt_setprop_u32(blob, offset, "clock-frequency", freq))
+				printf("WARNING: Failed to set CPU PLL port 0 clock-frequency\n");
+			else
+				printf("fdt board setup: CPU PLL port 0 clock-frequency = %u Hz\n",
+				       freq);
+		}
 	}
 
 	/*
