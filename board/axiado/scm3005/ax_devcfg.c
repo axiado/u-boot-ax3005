@@ -97,25 +97,29 @@ typedef struct ax_board_config_header_s {
 #define AX_BOARD_CONFIG_MAGIC   0x42434647U
 
 /*
- * The generic-timer counter is clocked by CPU_CLOCK = CPU-PLL VCO /
- * ((POSTDIV0_2 + 1) * (POSTDIV1_2 + 1)). The control processor owns the PLL
- * and may change that divider via a dev-cfg register setting. The VCO is
- * fixed at 4000 MHz; only the post-divider changes.
+ * Each CPU-PLL output port n runs at
+ *   VCO / ((POSTDIV0_n + 1) * (POSTDIV1_n + 1))
+ * Port 0 is CPU_CLOCK (parent of the SP* peripheral pclk); port 2 clocks the
+ * CPU generic-timer counter. The control processor owns the PLL and may
+ * change the post-dividers via a dev-cfg register setting. The VCO is fixed
+ * at 4000 MHz; only the post-dividers change.
  */
 #define AX_DEV_CFG_HANDOFF_ADDR			0x800FF000UL /* must match ax_board_init.c */
 #define AX_CPU_PLL_POSTDIV_DEVCFG_ADDR	0x40000008U  /* AX_BOARD_REG_SETTING_BASE + 0x08 */
-#define AX3005_POSTDIV0_2_LSB			6U
-#define AX3005_POSTDIV1_2_LSB			18U
+#define AX3005_POSTDIV0_LSB(port)		(3U * (port))
+#define AX3005_POSTDIV1_LSB(port)		(12U + 3U * (port))
+#define AX_CPU_PLL_PORT_CPU_CLOCK		0U
+#define AX_CPU_PLL_PORT			2U
 #define AX_POSTDIV_MASK					0x7U
 #define AX_CPU_PLL_VCO_HZ				4000000000ULL
-#define AX_DEFAULT_COUNTER_FREQ			1000000000U  /* default CPU_CLOCK = 4000/4 */
+#define AX_DEFAULT_COUNTER_FREQ			1000000000U  /* default port 2 = 4000/4 */
 
 /*
- * Derive the counter frequency from the dev-cfg blob left at AX_DEV_CFG_HANDOFF_ADDR.
- " Returns the default 1 GHz when the blob is absent or
- * invalid, or when it carries no CPU-PLL post-divider override.
+ * Derive the rate of CPU-PLL output @port from the dev-cfg blob left at
+ * AX_DEV_CFG_HANDOFF_ADDR. Returns 0 when the blob is absent or invalid, or
+ * when it carries no CPU-PLL post-divider override (PLL left at its default).
  */
-u32 ax_counter_freq_from_devcfg(void)
+static u32 ax_cpu_pll_port_freq(u32 port)
 {
 	const ax_board_config_header_t *hdr =
 		(const ax_board_config_header_t *)AX_DEV_CFG_HANDOFF_ADDR;
@@ -123,13 +127,13 @@ u32 ax_counter_freq_from_devcfg(void)
 
 	if (hdr->magic != AX_BOARD_CONFIG_MAGIC ||
 	    hdr->total_size != sizeof(*hdr))
-		return AX_DEFAULT_COUNTER_FREQ;
+		return 0;
 
 	/* CRC32 covers total_size..end (standard zlib CRC, == ax_bm_crc32). */
 	len = hdr->total_size - offsetof(ax_board_config_header_t, total_size);
 	crc = crc32(0, (const unsigned char *)&hdr->total_size, len);
 	if (crc != hdr->crc32)
-		return AX_DEFAULT_COUNTER_FREQ;
+		return 0;
 
 	/*
 	 * reg_setting_count and reg_setting[] fall on non-4-byte-aligned
@@ -145,14 +149,28 @@ u32 ax_counter_freq_from_devcfg(void)
 		if (get_unaligned_le32(&hdr->reg_setting[i].addr) ==
 		    AX_CPU_PLL_POSTDIV_DEVCFG_ADDR) {
 			u32 val = get_unaligned_le32(&hdr->reg_setting[i].value);
-			u32 d0 = (val >> AX3005_POSTDIV0_2_LSB) & AX_POSTDIV_MASK;
-			u32 d1 = (val >> AX3005_POSTDIV1_2_LSB) & AX_POSTDIV_MASK;
+			u32 d0 = (val >> AX3005_POSTDIV0_LSB(port)) & AX_POSTDIV_MASK;
+			u32 d1 = (val >> AX3005_POSTDIV1_LSB(port)) & AX_POSTDIV_MASK;
 
 			return (u32)(AX_CPU_PLL_VCO_HZ / ((u64)(d0 + 1) * (d1 + 1)));
 		}
 	}
 
-	return AX_DEFAULT_COUNTER_FREQ;
+	return 0;
+}
+
+/* Generic-timer counter rate; defaults to 1 GHz without a dev-cfg override. */
+u32 ax_counter_freq_from_devcfg(void)
+{
+	u32 freq = ax_cpu_pll_port_freq(AX_CPU_PLL_PORT);
+
+	return freq ? freq : AX_DEFAULT_COUNTER_FREQ;
+}
+
+/* CPU_CLOCK rate, or 0 if dev-cfg doesn't override the PLL default. */
+u32 ax_cpu_clock_from_devcfg(void)
+{
+	return ax_cpu_pll_port_freq(AX_CPU_PLL_PORT_CPU_CLOCK);
 }
 
 u32 get_uart_address_from_devcfg(void)
