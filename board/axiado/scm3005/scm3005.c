@@ -5,6 +5,7 @@
 
 #include <config.h>
 #include <dm.h>
+#include <dm/uclass.h>
 #include <init.h>
 #include <asm/global_data.h>
 #include <asm/armv8/mmu.h>
@@ -26,6 +27,10 @@ u32 ax_counter_freq_from_devcfg(void);
 u32 ax_cpu_clock_from_devcfg(void);
 
 static int get_uart_index_from_fru(void);
+
+#define UART3ID			3
+#define UART4ID			4
+#define AX_DEFAULT_UARTID	UART3ID
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -53,12 +58,55 @@ int board_fit_config_name_match(const char *name)
 }
 
 /*
- * uart4_is_console - does the FRU EEPROM select UART4 as console?
+ * uart4_is_console - does the "uartid" environment variable select UART4?
  *
+ * uartid defaults to 3. Only 3 and 4 are valid; anything else falls back
+ * to UART3. Needs the environment, so it must not be called before
+ * initr_env() (i.e. not from board_early_init_f/r).
  */
 static bool uart4_is_console(void)
 {
-	return get_uart_index_from_fru() == 4;
+	ulong id = env_get_ulong("uartid", 10, AX_DEFAULT_UARTID);
+
+	if (id != UART3ID && id != UART4ID) {
+		printf("WARNING: invalid uartid %lu, using UART%d\n", id,
+		       AX_DEFAULT_UARTID);
+		return false;
+	}
+
+	return id == UART4ID;
+}
+
+/*
+ * sync_uartid_with_fru - make the "uartid" variable follow the FRU
+ *
+ * If the FRU UART index (3 or 4) differs from uartid, uartid is updated to
+ * the FRU value so the console switch below uses it. If the FRU can't be read
+ * or holds another value, uartid is left as is. The new value is only in RAM
+ * until the user runs saveenv.
+ */
+static void sync_uartid_with_fru(void)
+{
+	int fru_id = get_uart_index_from_fru();
+	ulong uartid = env_get_ulong("uartid", 10, AX_DEFAULT_UARTID);
+	int ret;
+
+	if (fru_id != UART3ID && fru_id != UART4ID) {
+		if (fru_id >= 0)
+			printf("FRU: invalid UART index %d, keeping uartid=%lu\n",
+			       fru_id, uartid);
+		return;
+	}
+
+	if (uartid == fru_id)
+		return;
+
+	printf("FRU UART index %d != uartid %lu, setting uartid=%d\n",
+	       fru_id, uartid, fru_id);
+	env_set_ulong("uartid", fru_id);
+	ret = env_save();
+	if (ret)
+		printf("WARNING: Failed to write default environment (%d)\n", ret);
 }
 
 /*
@@ -84,11 +132,11 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	for (offset = fdt_first_subnode(blob, cpus_offset); offset >= 0;
 	     offset = fdt_next_subnode(blob, offset)) {
 		prop = fdt_getprop(blob, offset, "device_type", NULL);
-		if (!prop || strcmp(prop, "cpu"))
+		if (!prop || strncmp(prop, "cpu", sizeof("cpu")))
 			continue;
 
 		prop = fdt_getprop(blob, offset, "enable-method", NULL);
-		if (!prop || strcmp(prop, "spin-table"))
+		if (!prop || strncmp(prop, "spin-table", sizeof("spin-table")))
 			continue;
 
 		ret = fdt_setprop_u64(blob, offset, "cpu-release-addr",
@@ -489,9 +537,42 @@ int board_late_init(void)
 			       ret);
 	}
 
-	/* console=ttyPS3 --> console=ttyPS4 when dev-cfg selects UART4 */
-	if (uart4_is_console())
+	sync_uartid_with_fru();
+
+	/* uartid=4 selects UART4 for both U-Boot and the kernel console */
+	if (uart4_is_console()) {
+		struct udevice *uart;
+
 		env_set("bootargs", AX_BOOTARGS_UART4);
+
+		/*
+		 * Move U-Boot's own console to UART4. Setting the stdio
+		 * variables triggers console_assign() through the env
+		 * callback; everything printed after this goes to UART4.
+		 */
+		ret = uclass_get_device_by_seq(UCLASS_SERIAL, UART4ID, &uart);
+		if (!ret) {
+			printf("Switching console to UART4 (%s, baud %d)\n",
+			       uart->name, gd->baudrate);
+
+			ret = env_set("stdout", uart->name);
+			if (ret)
+				printf("WARNING: stdout -> %s failed (%d)\n",
+				       uart->name, ret);
+			env_set("stderr", uart->name);
+			env_set("stdin", uart->name);
+			printf("Console is now on UART4 (%s)\n", uart->name);
+		} else {
+			printf("WARNING: UART4 not available (%d), console stays on UART3\n",
+			       ret);
+		}
+	} else {
+		const char *args = env_get("bootargs");
+
+		/* undo a UART4 bootargs left in a saved environment */
+		if (args && !strncmp(args, AX_BOOTARGS_UART4, sizeof(AX_BOOTARGS_UART4)))
+			env_set("bootargs", AX_BOOTARGS_UART3);
+	}
 
 	setup_fdt_conf_bootcmd();
 
@@ -547,24 +628,3 @@ void board_preboot_os(void)
 	set_pad_before_kernel_state();
 }
 
-int board_early_init_f(void)
-{
-	void *blob = (void *)gd->fdt_blob;
-	const char *path = "serial4:115200";
-	int chosen;
-
-	/*
-	 * This runs before relocate_code(), so nothing here may write a global
-	 * or static variable: .bss is linked over .rela.dyn (both start at
-	 * __rel_dyn_start), so such a store lands on a relocation entry and
-	 * wedges relocate_code() before board_init_r() can report anything.
-	 * Keep the result local; post-relocation consumers must re-derive it.
-	 */
-	if (uart4_is_console()) {
-		fdt_open_into(blob, blob, fdt_totalsize(blob) + 64); /* headroom for the string */
-		chosen = fdt_path_offset(blob, "/chosen");
-		fdt_setprop_string(blob, chosen, "stdout-path", path);
-	}
-
-	return 0;
-}
