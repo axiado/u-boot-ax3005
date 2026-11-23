@@ -43,8 +43,7 @@
 
 /* The "\0" separator belongs to this NUL-delimited list, not to the macros. */
 #define CFG_EXTRA_ENV_SETTINGS \
-	"bootargs=" AX_BOOTARGS_UART3 "\0" \
-	"uartid=3\0"
+	"bootargs=" AX_BOOTARGS_UART3 "\0"
 
 #define CFG_SYS_BAUDRATE_TABLE	\
 	{ 4800, 9600, 19200, 38400, 57600, 115200 }
